@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bun install:*)",
+      "Bash(bun run build)",
+      "Bash(tree:*)",
+      "Bash(chmod:*)",
+      "Bash(./create-topics.sh)",
+      "Bash(docker exec:*)",
+      "Bash(bun run:*)",
+      "Bash(bun:*)",
+      "Bash(cat:*)",
+      "Read(//mnt/d/project/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

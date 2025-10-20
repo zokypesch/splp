@@ -1,0 +1,12 @@
+{
+  "name": "splp-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "splp-bun",
+    "command-center"
+  ],
+  "scripts": {
+    "build": "cd splp-bun && bun run build"
+  }
+}

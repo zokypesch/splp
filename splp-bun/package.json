@@ -1,0 +1,35 @@
+{
+  "name": "kafka-request-reply",
+  "version": "1.0.0",
+  "description": "Request-Reply pattern over Kafka with encryption, tracing, and Cassandra logging",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "bun run --watch src/examples/worker.ts",
+    "example:worker": "bun run src/examples/worker.ts",
+    "example:client": "bun run src/examples/client.ts",
+    "command-center": "bun run ../command-center/index.ts",
+    "example:publisher-cc": "bun run ../command-center/examples/publisher-with-command-center.ts",
+    "test": "bun test"
+  },
+  "keywords": [
+    "kafka",
+    "request-reply",
+    "messaging",
+    "cassandra",
+    "tracing"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "kafkajs": "^2.2.4",
+    "cassandra-driver": "^4.7.2"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.0.0",
+    "@types/node": "^20.11.5",
+    "typescript": "^5.3.3"
+  }
+}

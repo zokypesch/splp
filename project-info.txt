@@ -1,0 +1,27 @@
+# purpose
+so we want a create a ecosystem for Request reply over messaging bus.
+so we want to use stack:
+- kafka
+- cassandra -> for logging and tracing
+- bun + typescript for example worker (consumer & publisher)
+
+we need create an library for wrapping a whole process, including:
+    - connection to kafka for both consumer, producer: so users only write a single line of code for connection`
+    - generate request_id, request_id is important for tracing \
+    - utility for encrypt and decrypt using a key for request and receive (exclude request_id) (producer & consumer) this is auto if users call for example
+        request(request_id, payload) automaticly encrypt the payload and then push to kafka, for consumer than automaticlly decrypt 
+    - we excpect users only register their handler
+    - utility for logging so we shipping automaticlly after, 
+    - the payload it should be json payload
+
+so for next we need create a command center service under command-center folder, command service it would be:
+- receive for every single publisher and do route (publish) to target topic
+- it have a schema registery, so schema registry is including target route, and information about a service
+- any receive or publish command center would be save to cassandra for request_id, worker_name(publisher), timestamp and any kind of information (exclude payload)
+
+so we have scenario:
+- first publish to command center,  command center than route to service_1
+- service 1 receive and than publish to command center, command center than route (publish) to service_2
+
+please create new folder in route called "example-bun", there is 3 folders: publisher, service_1 and service_2.
+but first create docker-compose for kafka and cassandra, using ttl for data both 1 week
