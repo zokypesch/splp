@@ -169,7 +169,7 @@ func (c *MessagingClient) Request(topic string, payload interface{}, timeout tim
 	}()
 
 	// Send the encrypted message
-	if err := c.kafkaWrapper.SendMessage(topic, encryptedMessage); err != nil {
+	if err := c.kafkaWrapper.SendMessageJSON(topic, encryptedMessage); err != nil {
 		return nil, fmt.Errorf("failed to send message: %w", err)
 	}
 
@@ -237,7 +237,7 @@ func (c *MessagingClient) Reply(request *types.RequestMessage, payload interface
 	}
 
 	// Send the encrypted response
-	return c.kafkaWrapper.SendMessage(request.ReplyTo, encryptedMessage)
+	return c.kafkaWrapper.SendMessageJSON(request.ReplyTo, encryptedMessage)
 }
 
 // Close shuts down the messaging client

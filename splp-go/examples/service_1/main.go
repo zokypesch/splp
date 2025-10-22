@@ -66,19 +66,26 @@ func main() {
 	fmt.Println("    Population Data Verification Service")
 	fmt.Println("═══════════════════════════════════════════════════════════\n")
 
-	// Configuration
-	config := &types.KafkaConfig{
-		Brokers:          []string{"10.70.1.23:9092"},
-		ClientID:         "dukcapil-service",
-		GroupID:          "service-1-group",
+	// Load configuration from environment variables
+	config, err := LoadConfig()
+	if err != nil {
+		log.Fatalf("❌ Failed to load configuration: %v", err)
+	}
+
+	// Print configuration (excluding sensitive data)
+	config.PrintConfig()
+	fmt.Println()
+
+	// Create Kafka configuration
+	kafkaConfig := &types.KafkaConfig{
+		Brokers:          config.Kafka.Brokers,
+		ClientID:         config.Kafka.ClientID,
+		GroupID:          config.Kafka.GroupID,
 		RequestTimeoutMs: 30000,
 	}
 
-	// Get encryption key
-	encryptionKey := getEncryptionKey()
-
 	// Create Kafka wrapper
-	kafkaWrapper, err := kafka.NewKafkaWrapper(config)
+	kafkaWrapper, err := kafka.NewKafkaWrapper(kafkaConfig)
 	if err != nil {
 		log.Fatalf("❌ Failed to create Kafka wrapper: %v", err)
 	}
@@ -87,28 +94,29 @@ func main() {
 	}
 
 	// Create encryptor
-	encryptor, err := crypto.NewEncryptor(encryptionKey)
+	encryptor, err := crypto.NewEncryptor(config.Encryption.Key)
 	if err != nil {
 		log.Fatalf("❌ Failed to create encryptor: %v", err)
 	}
 
 	fmt.Println("✓ Dukcapil terhubung ke Kafka")
-	fmt.Println("✓ Listening on topic: service-1-topic (group: service-1-group)")
+	fmt.Printf("✓ Listening on topic: %s (group: %s)\n", config.Kafka.ConsumerTopic, config.Kafka.GroupID)
 	fmt.Println("✓ Siap memverifikasi data kependudukan\n")
 
 	// Set up message processor
 	processor := &MessageProcessor{
 		encryptor:    encryptor,
 		kafkaWrapper: kafkaWrapper,
+		config:       config,
 	}
 	kafkaWrapper.SetMessageHandler(processor)
 
 	// Start consuming
-	if err := kafkaWrapper.StartConsuming([]string{"service-1-topic"}); err != nil {
+	if err := kafkaWrapper.StartConsuming([]string{config.Kafka.ConsumerTopic}); err != nil {
 		log.Fatalf("❌ Failed to start consuming: %v", err)
 	}
 
-	fmt.Println("Service 1 is running and waiting for messages...")
+	fmt.Printf("Service 1 (%s) is running and waiting for messages...\n", config.Service.Name)
 	fmt.Println("Press Ctrl+C to exit\n")
 
 	// Wait for interrupt signal
@@ -116,7 +124,7 @@ func main() {
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 	<-sigChan
 
-	fmt.Println("\n\nShutting down Service 1...")
+	fmt.Printf("\n\nShutting down %s...\n", config.Service.Name)
 	kafkaWrapper.Close()
 }
 
@@ -124,6 +132,7 @@ func main() {
 type MessageProcessor struct {
 	encryptor    types.Encryptor
 	kafkaWrapper types.KafkaClient
+	config       *Config
 }
 
 // ProcessMessage implements the MessageProcessor interface
@@ -237,9 +246,9 @@ func (p *MessageProcessor) ProcessMessage(message []byte) error {
 	outgoingMessage := CommandCenterMessage{
 		RequestID:  requestID,
 		WorkerName: "service-1-publisher", // This identifies routing: service_1 -> service_2
-		Data:       string(encryptedResult.EncryptedData),
-		IV:         string(encryptedResult.IV),
-		Tag:        string(encryptedResult.AuthTag),
+		Data:       encryptedResult.Data,
+		IV:         encryptedResult.IV,
+		Tag:        encryptedResult.Tag,
 	}
 
 	messageBytes, err := json.Marshal(outgoingMessage)
@@ -248,7 +257,7 @@ func (p *MessageProcessor) ProcessMessage(message []byte) error {
 	}
 
 	fmt.Println("📤 Mengirim hasil verifikasi ke Command Center...")
-	if err := p.kafkaWrapper.SendMessage("command-center-inbox", messageBytes); err != nil {
+	if err := p.kafkaWrapper.SendMessage(p.config.Kafka.ProducerTopic, string(messageBytes)); err != nil {
 		return fmt.Errorf("failed to send message: %w", err)
 	}
 
@@ -259,22 +268,4 @@ func (p *MessageProcessor) ProcessMessage(message []byte) error {
 	fmt.Println()
 
 	return nil
-}
-
-// getEncryptionKey returns the encryption key from environment or generates a new one
-func getEncryptionKey() string {
-	if key := os.Getenv("ENCRYPTION_KEY"); key != "" {
-		return key
-	}
-
-	// Generate a new key for demo purposes
-	key, err := crypto.GenerateEncryptionKey()
-	if err != nil {
-		log.Fatalf("❌ Failed to generate encryption key: %v", err)
-	}
-
-	fmt.Printf("🔑 Generated encryption key: %s\n", key)
-	fmt.Println("💡 Set ENCRYPTION_KEY environment variable to use a consistent key\n")
-
-	return key
 }

@@ -16,6 +16,74 @@ type MockMessageProcessor struct {
 	mock.Mock
 }
 
+func TestKafkaWrapper_SendMessageJSON_WithMockProducer(t *testing.T) {
+	config := &types.KafkaConfig{
+		Brokers:          []string{"localhost:9092"},
+		GroupID:          "test-group",
+		RequestTimeoutMs: 5000,
+	}
+
+	wrapper, err := NewKafkaWrapper(config)
+	require.NoError(t, err)
+
+	tests := []struct {
+		name          string
+		setupProducer func() *MockSyncProducer
+		topic         string
+		message       interface{}
+		expectedError bool
+	}{
+		{
+			name: "successful send",
+			setupProducer: func() *MockSyncProducer {
+				mockProducer := &MockSyncProducer{}
+				mockProducer.On("SendMessage", mock.AnythingOfType("*sarama.ProducerMessage")).Return(int32(0), int64(123), nil)
+				return mockProducer
+			},
+			topic:         "test-topic",
+			message:       map[string]interface{}{"test": "data"},
+			expectedError: false,
+		},
+		{
+			name: "producer error",
+			setupProducer: func() *MockSyncProducer {
+				mockProducer := &MockSyncProducer{}
+				mockProducer.On("SendMessage", mock.AnythingOfType("*sarama.ProducerMessage")).Return(int32(0), int64(0), assert.AnError)
+				return mockProducer
+			},
+			topic:         "test-topic",
+			message:       map[string]interface{}{"test": "data"},
+			expectedError: true,
+		},
+		{
+			name: "unmarshalable message",
+			setupProducer: func() *MockSyncProducer {
+				return &MockSyncProducer{}
+			},
+			topic:         "test-topic",
+			message:       make(chan int), // channels can't be marshaled to JSON
+			expectedError: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockProducer := tt.setupProducer()
+			wrapper.producer = mockProducer
+
+			err := wrapper.SendMessageJSON(tt.topic, tt.message)
+
+			if tt.expectedError {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+
+			mockProducer.AssertExpectations(t)
+		})
+	}
+}
+
 func (m *MockMessageProcessor) ProcessMessage(message []byte) error {
 	args := m.Called(message)
 	return args.Error(0)
@@ -417,7 +485,7 @@ func TestKafkaWrapper_SendMessage_WithMockProducer(t *testing.T) {
 		name          string
 		setupProducer func() *MockSyncProducer
 		topic         string
-		message       interface{}
+		message       string
 		expectedError bool
 	}{
 		{
@@ -428,7 +496,7 @@ func TestKafkaWrapper_SendMessage_WithMockProducer(t *testing.T) {
 				return mockProducer
 			},
 			topic:         "test-topic",
-			message:       map[string]interface{}{"test": "data"},
+			message:       `{"test": "data"}`,
 			expectedError: false,
 		},
 		{
@@ -439,16 +507,7 @@ func TestKafkaWrapper_SendMessage_WithMockProducer(t *testing.T) {
 				return mockProducer
 			},
 			topic:         "test-topic",
-			message:       map[string]interface{}{"test": "data"},
-			expectedError: true,
-		},
-		{
-			name: "unmarshalable message",
-			setupProducer: func() *MockSyncProducer {
-				return &MockSyncProducer{}
-			},
-			topic:         "test-topic",
-			message:       make(chan int), // channels can't be marshaled to JSON
+			message:       `{"test": "data"}`,
 			expectedError: true,
 		},
 	}
@@ -470,6 +529,7 @@ func TestKafkaWrapper_SendMessage_WithMockProducer(t *testing.T) {
 		})
 	}
 }
+}
 
 func TestKafkaWrapper_SendMessage_NoProducer(t *testing.T) {
 	config := &types.KafkaConfig{
@@ -482,7 +542,7 @@ func TestKafkaWrapper_SendMessage_NoProducer(t *testing.T) {
 	require.NoError(t, err)
 
 	// No producer initialized
-	err = wrapper.SendMessage("test-topic", map[string]interface{}{"test": "data"})
+	err = wrapper.SendMessage("test-topic", `{"test": "data"}`)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "producer not initialized")
 }
