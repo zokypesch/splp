@@ -1,0 +1,6 @@
+E:\perlinsos\splp\example-net\Service1\obj\Release\netcoreapp3.1\Service1.csproj.AssemblyReference.cache
+E:\perlinsos\splp\example-net\Service1\obj\Release\netcoreapp3.1\Service1.GeneratedMSBuildEditorConfig.editorconfig
+E:\perlinsos\splp\example-net\Service1\obj\Release\netcoreapp3.1\Service1.AssemblyInfoInputs.cache
+E:\perlinsos\splp\example-net\Service1\obj\Release\netcoreapp3.1\Service1.AssemblyInfo.cs
+E:\perlinsos\splp\example-net\Service1\obj\Release\netcoreapp3.1\Service1.csproj.CoreCompileInputs.cache
+E:\perlinsos\splp\example-net\Service1\obj\Release\netcoreapp3.1\Service1.sourcelink.json
