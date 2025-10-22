@@ -7,7 +7,7 @@ return [
     |--------------------------------------------------------------------------
     */
     'kafka' => [
-        'brokers' => explode(',', env('SPLP_KAFKA_BROKERS', 'localhost:9092')),
+        'brokers' => explode(',', env('SPLP_KAFKA_BROKERS', '10.70.1.23:9092')),
         'clientId' => env('SPLP_KAFKA_CLIENT_ID', 'laravel-app'),
         'groupId' => env('SPLP_KAFKA_GROUP_ID', 'laravel-app-group'),
     ],
