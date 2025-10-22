@@ -95,10 +95,15 @@ public class Service1Worker
                     var messageValue = consumeResult.Message.Value;
                     _logger.LogInformation("─".PadRight(60, '─'));
                     _logger.LogInformation("📥 [DUKCAPIL] Menerima data dari Command Center");
+                    _logger.LogInformation("📄 Raw message: {Message}", messageValue);
 
                     // Parse and decrypt
                     var encryptedMsg = JsonSerializer.Deserialize<EncryptedMessage>(messageValue);
                     if (encryptedMsg == null) return;
+
+                    _logger.LogInformation("🔑 Decrypting with key: {Key}", config.Encryption.EncryptionKey);
+                    _logger.LogInformation("   IV length: {IvLen} chars, Tag length: {TagLen} chars",
+                        encryptedMsg.Iv?.Length ?? 0, encryptedMsg.Tag?.Length ?? 0);
 
                     var (requestId, payload) = EncryptionService.DecryptPayload<BansosCitizenRequest>(
                         encryptedMsg, config.Encryption.EncryptionKey);
