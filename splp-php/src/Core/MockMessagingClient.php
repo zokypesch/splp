@@ -8,12 +8,9 @@ use Splp\Messaging\Contracts\MessagingClientInterface;
 use Splp\Messaging\Contracts\RequestHandlerInterface;
 
 /**
- * Production MessagingClient
- * 
- * This is a placeholder implementation. In production, this would use
- * real Kafka and Cassandra drivers.
+ * Mock MessagingClient for testing without real Kafka/Cassandra dependencies
  */
-class MessagingClient implements MessagingClientInterface
+class MockMessagingClient implements MessagingClientInterface
 {
     private array $config;
     private array $handlers = [];
@@ -26,7 +23,7 @@ class MessagingClient implements MessagingClientInterface
 
     public function initialize(): void
     {
-        echo "🔧 Production MessagingClient initialized\n";
+        echo "🔧 MockMessagingClient initialized\n";
         echo "   - Kafka brokers: " . implode(', ', $this->config['kafka']['brokers']) . "\n";
         echo "   - Cassandra keyspace: " . $this->config['cassandra']['keyspace'] . "\n";
         echo "   - Encryption enabled: " . (isset($this->config['encryption']['encryptionKey']) ? 'Yes' : 'No') . "\n";
@@ -72,10 +69,9 @@ class MessagingClient implements MessagingClientInterface
         }
 
         echo "🔄 Starting consumption for topics: " . implode(', ', $topics) . "\n";
-        echo "ℹ️  In production mode, this would connect to real Kafka\n\n";
+        echo "ℹ️  In mock mode, this simulates continuous message consumption\n\n";
 
-        // In production, this would start real Kafka consumer
-        // For now, we'll simulate continuous consumption
+        // Simulate continuous message consumption
         $counter = 0;
         $messageTypes = [
             'user_registration',
@@ -90,33 +86,33 @@ class MessagingClient implements MessagingClientInterface
             $topic = $topics[$counter % count($topics)];
             $messageType = $messageTypes[$counter % count($messageTypes)];
             
-            $message = $this->generateProductionMessage($messageType, $counter + 1);
+            $message = $this->generateMockMessage($messageType, $counter + 1);
             
-            echo "[PRODUCTION] Consuming message from {$topic} | type={$messageType}\n";
+            echo "[MOCK] Consuming message from {$topic} | type={$messageType}\n";
             
             try {
                 if (isset($this->handlers[$topic])) {
                     $response = $this->handlers[$topic]->handle($message['requestId'], $message);
-                    echo "[PRODUCTION] Handler response: " . json_encode($response, JSON_PRETTY_PRINT) . "\n\n";
+                    echo "[MOCK] Handler response: " . json_encode($response, JSON_PRETTY_PRINT) . "\n\n";
                 } else {
-                    echo "[PRODUCTION] No handler for topic: {$topic}\n\n";
+                    echo "[MOCK] No handler for topic: {$topic}\n\n";
                 }
             } catch (\Exception $e) {
-                echo "[PRODUCTION] Handler error: " . $e->getMessage() . "\n\n";
+                echo "[MOCK] Handler error: " . $e->getMessage() . "\n\n";
             }
             
             $counter++;
-            usleep(3000000); // 3 seconds between messages
+            usleep(2000000); // 2 seconds between messages
         }
     }
 
-    private function generateProductionMessage(string $type, int $sequence): array
+    private function generateMockMessage(string $type, int $sequence): array
     {
         $baseMessage = [
             'type' => $type,
             'sequence' => $sequence,
             'timestamp' => date('Y-m-d H:i:s'),
-            'requestId' => 'prod_req_' . uniqid() . '_' . $sequence
+            'requestId' => 'mock_req_' . uniqid() . '_' . $sequence
         ];
 
         return match($type) {
