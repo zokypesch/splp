@@ -17,6 +17,7 @@ const kafkaConfig: KafkaConfig = {
 };
 
 const encryptionKey = process.env.ENCRYPTION_KEY || generateEncryptionKey();
+// const encryptionKey = "a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b27796d93e0078";
 
 interface BansosCitizenRequest {
   registrationId: string;
