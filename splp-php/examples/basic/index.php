@@ -22,7 +22,7 @@ class BasicExample
     {
         $config = [
             'kafka' => [
-                'brokers' => ['localhost:9092'],
+                'brokers' => ['10.70.1.23:9092'],
                 'clientId' => 'basic-example',
                 'groupId' => 'basic-example-group'
             ],
