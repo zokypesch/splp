@@ -29,7 +29,7 @@ class MockBasicExample
                 'keyspace' => 'basic_example'
             ],
             'encryption' => [
-                'encryptionKey' => '8cba970142b7fa5038b2808aed8e044aee4779821610abc88f19cc286876f90'
+                'encryptionKey' => 'b9c4d62e772f6e1a4f8e0a139f50d96f7aefb2dc098fe3c53ad22b4b3a9c9e7'
             ]
         ];
     }
