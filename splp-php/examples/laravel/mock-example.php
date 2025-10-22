@@ -28,7 +28,7 @@ class MockLaravelExample
                 'keyspace' => 'laravel_keyspace'
             ],
             'encryption' => [
-                'encryptionKey' => '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
+                'encryptionKey' => '8cba970142b7fa5038b2808aed8e044aee4779821610abc88f19cc286876f90'
             ]
         ];
     }
