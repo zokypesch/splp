@@ -37,11 +37,10 @@ type MessagingConfig struct {
 
 // EncryptedMessage represents an encrypted message with metadata
 type EncryptedMessage struct {
-	RequestID     string    `json:"request_id"`
-	EncryptedData []byte    `json:"encrypted_data"`
-	IV            []byte    `json:"iv"`
-	AuthTag       []byte    `json:"auth_tag"`
-	Timestamp     time.Time `json:"timestamp"`
+	RequestID string `json:"request_id"` // Not encrypted for tracing
+	Data      string `json:"data"`       // Encrypted payload as hex string
+	IV        string `json:"iv"`         // Initialization vector as hex string
+	Tag       string `json:"tag"`        // Authentication tag as hex string
 }
 
 // RequestMessage represents a request message
@@ -104,7 +103,8 @@ type KafkaClient interface {
 	Initialize() error
 	SetMessageHandler(handler MessageProcessor)
 	StartConsuming(topics []string) error
-	SendMessage(topic string, message interface{}) error
+	SendMessage(topic string, message string) error
+	SendMessageJSON(topic string, message interface{}) error
 	Close() error
 	IsConsuming() bool
 }

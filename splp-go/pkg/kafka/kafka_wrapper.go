@@ -145,7 +145,8 @@ func (k *KafkaWrapper) StartConsuming(topics []string) error {
 }
 
 // SendMessage sends a message to the specified topic
-func (k *KafkaWrapper) SendMessage(topic string, message interface{}) error {
+// This matches the TypeScript sendMessage function signature
+func (k *KafkaWrapper) SendMessage(topic string, message string) error {
 	k.mu.RLock()
 	producer := k.producer
 	k.mu.RUnlock()
@@ -154,16 +155,10 @@ func (k *KafkaWrapper) SendMessage(topic string, message interface{}) error {
 		return fmt.Errorf("producer not initialized")
 	}
 
-	// Marshal message to JSON
-	messageBytes, err := json.Marshal(message)
-	if err != nil {
-		return fmt.Errorf("failed to marshal message: %w", err)
-	}
-
-	// Create Kafka message
+	// Create Kafka message (message is already a JSON string)
 	kafkaMessage := &sarama.ProducerMessage{
 		Topic: topic,
-		Value: sarama.StringEncoder(messageBytes),
+		Value: sarama.StringEncoder(message),
 	}
 
 	// Send message
@@ -174,6 +169,18 @@ func (k *KafkaWrapper) SendMessage(topic string, message interface{}) error {
 
 	log.Printf("Message sent to topic %s, partition %d, offset %d", topic, partition, offset)
 	return nil
+}
+
+// SendMessageJSON sends a message to the specified topic after marshaling to JSON
+// This is a convenience method for backward compatibility
+func (k *KafkaWrapper) SendMessageJSON(topic string, message interface{}) error {
+	// Marshal message to JSON
+	messageBytes, err := json.Marshal(message)
+	if err != nil {
+		return fmt.Errorf("failed to marshal message: %w", err)
+	}
+
+	return k.SendMessage(topic, string(messageBytes))
 }
 
 // Close closes the Kafka wrapper and releases resources

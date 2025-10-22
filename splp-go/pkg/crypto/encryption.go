@@ -8,16 +8,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"time"
 
 	"github.com/perlinsos/splp-go/pkg/types"
 )
 
 const (
 	// AES-256-GCM constants
-	keySize = 32 // 256 bits
-	ivSize  = 12 // 96 bits (standard for GCM)
-	tagSize = 16 // 128 bits
+	algorithm = "aes-256-gcm"
+	keySize   = 32 // 256 bits
+	ivLength  = 16 // 128 bits (16 bytes) - matching TypeScript
+	tagLength = 16 // 128 bits
 )
 
 // Encryptor implements the encryption interface using AES-256-GCM
@@ -39,8 +39,9 @@ func NewEncryptor(hexKey string) (*Encryptor, error) {
 	return &Encryptor{key: key}, nil
 }
 
-// Encrypt encrypts a JSON payload using AES-256-GCM
-func (e *Encryptor) Encrypt(payload interface{}, requestID string) (*types.EncryptedMessage, error) {
+// EncryptPayload encrypts a JSON payload using AES-256-GCM
+// This matches the TypeScript encryptPayload function exactly
+func (e *Encryptor) EncryptPayload(payload interface{}, requestID string) (*types.EncryptedMessage, error) {
 	// Convert payload to JSON string
 	payloadBytes, err := json.Marshal(payload)
 	if err != nil {
@@ -53,54 +54,56 @@ func (e *Encryptor) Encrypt(payload interface{}, requestID string) (*types.Encry
 		return nil, fmt.Errorf("failed to create AES cipher: %w", err)
 	}
 
-	// Create GCM mode
-	gcm, err := cipher.NewGCM(block)
+	// Create GCM mode with custom nonce size for 16-byte IV
+	gcm, err := cipher.NewGCMWithNonceSize(block, ivLength)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create GCM: %w", err)
 	}
 
-	// Generate random IV
-	iv := make([]byte, ivSize)
+	// Generate random IV (16 bytes to match TypeScript)
+	iv := make([]byte, ivLength)
 	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
 		return nil, fmt.Errorf("failed to generate IV: %w", err)
 	}
 
-	// Encrypt the data
-	ciphertext := gcm.Seal(nil, iv, payloadBytes, nil)
+	// Encrypt the data - in Go, gcm.Seal appends the tag to the ciphertext
+	// But TypeScript keeps them separate, so we need to split them
+	sealedData := gcm.Seal(nil, iv, payloadBytes, nil)
 
-	// Split ciphertext and tag
-	if len(ciphertext) < tagSize {
-		return nil, fmt.Errorf("ciphertext too short")
+	// The last 16 bytes are the authentication tag
+	if len(sealedData) < tagLength {
+		return nil, fmt.Errorf("sealed data too short")
 	}
 
-	encryptedData := ciphertext[:len(ciphertext)-tagSize]
-	tag := ciphertext[len(ciphertext)-tagSize:]
+	encryptedData := sealedData[:len(sealedData)-tagLength]
+	tag := sealedData[len(sealedData)-tagLength:]
 
 	return &types.EncryptedMessage{
-		RequestID:     requestID, // Not encrypted for tracing
-		EncryptedData: []byte(hex.EncodeToString(encryptedData)),
-		IV:            []byte(hex.EncodeToString(iv)),
-		AuthTag:       []byte(hex.EncodeToString(tag)),
-		Timestamp:     time.Now(),
+		RequestID: requestID, // Not encrypted for tracing
+		Data:      hex.EncodeToString(encryptedData),
+		IV:        hex.EncodeToString(iv),
+		Tag:       hex.EncodeToString(tag),
 	}, nil
 }
 
-// Decrypt decrypts an encrypted message using AES-256-GCM
-func (e *Encryptor) Decrypt(encryptedMessage *types.EncryptedMessage) (string, interface{}, error) {
-	// Decode hex-encoded fields
-	encryptedData, err := hex.DecodeString(string(encryptedMessage.EncryptedData))
-	if err != nil {
-		return "", nil, fmt.Errorf("failed to decode encrypted data: %w", err)
-	}
-	
-	iv, err := hex.DecodeString(string(encryptedMessage.IV))
+// DecryptPayload decrypts an encrypted message using AES-256-GCM
+// This matches the TypeScript decryptPayload function exactly
+func (e *Encryptor) DecryptPayload(encryptedMessage *types.EncryptedMessage) (string, interface{}, error) {
+	// Convert IV and tag from hex
+	iv, err := hex.DecodeString(encryptedMessage.IV)
 	if err != nil {
 		return "", nil, fmt.Errorf("failed to decode IV: %w", err)
 	}
-	
-	tag, err := hex.DecodeString(string(encryptedMessage.AuthTag))
+
+	tag, err := hex.DecodeString(encryptedMessage.Tag)
 	if err != nil {
 		return "", nil, fmt.Errorf("failed to decode tag: %w", err)
+	}
+
+	// Convert encrypted data from hex
+	encryptedData, err := hex.DecodeString(encryptedMessage.Data)
+	if err != nil {
+		return "", nil, fmt.Errorf("failed to decode encrypted data: %w", err)
 	}
 
 	// Create AES cipher
@@ -109,17 +112,17 @@ func (e *Encryptor) Decrypt(encryptedMessage *types.EncryptedMessage) (string, i
 		return "", nil, fmt.Errorf("failed to create AES cipher: %w", err)
 	}
 
-	// Create GCM mode
-	gcm, err := cipher.NewGCM(block)
+	// Create GCM mode with custom nonce size for 16-byte IV
+	gcm, err := cipher.NewGCMWithNonceSize(block, ivLength)
 	if err != nil {
 		return "", nil, fmt.Errorf("failed to create GCM: %w", err)
 	}
 
-	// Combine encrypted data and tag for decryption
-	ciphertext := append(encryptedData, tag...)
+	// Combine encrypted data and tag for decryption (gcm.Open expects this format)
+	sealedData := append(encryptedData, tag...)
 
 	// Decrypt the data
-	plaintext, err := gcm.Open(nil, iv, ciphertext, nil)
+	plaintext, err := gcm.Open(nil, iv, sealedData, nil)
 	if err != nil {
 		return "", nil, fmt.Errorf("failed to decrypt: %w", err)
 	}
@@ -133,22 +136,25 @@ func (e *Encryptor) Decrypt(encryptedMessage *types.EncryptedMessage) (string, i
 	return encryptedMessage.RequestID, payload, nil
 }
 
-// GenerateKey generates a new 256-bit encryption key
-func (e *Encryptor) GenerateKey() (string, error) {
-	key := make([]byte, keySize)
-	if _, err := io.ReadFull(rand.Reader, key); err != nil {
-		return "", fmt.Errorf("failed to generate encryption key: %w", err)
-	}
-	return hex.EncodeToString(key), nil
+// Legacy methods for backward compatibility
+// Encrypt is an alias for EncryptPayload
+func (e *Encryptor) Encrypt(payload interface{}, requestID string) (*types.EncryptedMessage, error) {
+	return e.EncryptPayload(payload, requestID)
 }
 
-// GenerateEncryptionKey is a standalone function to generate encryption keys
-func GenerateEncryptionKey() (string, error) {
+// Decrypt is an alias for DecryptPayload
+func (e *Encryptor) Decrypt(encryptedMessage *types.EncryptedMessage) (string, interface{}, error) {
+	return e.DecryptPayload(encryptedMessage)
+}
+
+// GenerateEncryptionKey generates a random encryption key for AES-256
+// This matches the TypeScript generateEncryptionKey function exactly
+func GenerateEncryptionKey() string {
 	key := make([]byte, keySize)
 	if _, err := io.ReadFull(rand.Reader, key); err != nil {
-		return "", fmt.Errorf("failed to generate encryption key: %w", err)
+		panic(fmt.Sprintf("failed to generate encryption key: %v", err))
 	}
-	return hex.EncodeToString(key), nil
+	return hex.EncodeToString(key)
 }
 
 // ValidateKey validates that a hex key is the correct length for AES-256

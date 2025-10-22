@@ -107,7 +107,8 @@ type KafkaClient interface {
 	Initialize() error
 	SetMessageHandler(handler MessageProcessor)
 	StartConsuming(topics []string) error
-	SendMessage(topic string, message interface{}) error
+	SendMessage(topic string, message string) error
+	SendMessageJSON(topic string, message interface{}) error
 	Close() error
 	IsConsuming() bool
 }
