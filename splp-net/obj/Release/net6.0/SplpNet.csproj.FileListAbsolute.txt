@@ -1,0 +1,13 @@
+E:\perlinsos\splp\splp-net\obj\Release\net6.0\SplpNet.csproj.AssemblyReference.cache
+E:\perlinsos\splp\splp-net\obj\Release\net6.0\SplpNet.GeneratedMSBuildEditorConfig.editorconfig
+E:\perlinsos\splp\splp-net\obj\Release\net6.0\SplpNet.AssemblyInfoInputs.cache
+E:\perlinsos\splp\splp-net\obj\Release\net6.0\SplpNet.AssemblyInfo.cs
+E:\perlinsos\splp\splp-net\obj\Release\net6.0\SplpNet.csproj.CoreCompileInputs.cache
+E:\perlinsos\splp\splp-net\obj\Release\net6.0\SplpNet.sourcelink.json
+E:\perlinsos\splp\splp-net\bin\Release\net6.0\SplpNet.deps.json
+E:\perlinsos\splp\splp-net\bin\Release\net6.0\SplpNet.dll
+E:\perlinsos\splp\splp-net\bin\Release\net6.0\SplpNet.pdb
+E:\perlinsos\splp\splp-net\obj\Release\net6.0\SplpNet.dll
+E:\perlinsos\splp\splp-net\obj\Release\net6.0\refint\SplpNet.dll
+E:\perlinsos\splp\splp-net\obj\Release\net6.0\SplpNet.pdb
+E:\perlinsos\splp\splp-net\obj\Release\net6.0\ref\SplpNet.dll

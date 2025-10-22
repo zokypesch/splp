@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net6.0;netcoreapp3.1</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackageId>SplpNet</PackageId>
+    <Version>1.0.6</Version>
+    <Authors>SPLP Team</Authors>
+    <Company>SPLP.Library</Company>
+    <Product>SplpNet</Product>
+    <Description>Kafka Request-Reply Messaging Library for .NET with encryption, tracing, and Cassandra logging</Description>
+    <PackageDescription>A comprehensive .NET library for implementing Request-Reply patterns over Kafka with built-in AES-256-GCM encryption, distributed tracing, and Cassandra logging. Supports .NET 8.0, .NET 6.0, and .NET Standard 2.1.</PackageDescription>
+    <PackageTags>kafka;request-reply;messaging;cassandra;tracing;encryption;aes;distributed;microservices</PackageTags>
+    <PackageOutputPath>.\nupkgs</PackageOutputPath>
+    <RepositoryUrl>https://github.com/your-org/splp-net</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>PACKAGE_README.md</PackageReadmeFile>
+    <PackageReleaseNotes>Initial release of SplpNet library with full Kafka request-reply support, AES-256-GCM encryption, and Cassandra logging.</PackageReleaseNotes>
+    <Copyright>Copyright (c) 2024 SPLP Team</Copyright>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="PACKAGE_README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <!-- Packages that are common and compatible across TFMs -->
+  <ItemGroup>
+    <PackageReference Include="Confluent.Kafka" Version="2.3.0" />
+    <PackageReference Include="CassandraCSharpDriver" Version="3.20.1" />
+  </ItemGroup>
+
+  <!-- Framework-specific package versions to avoid duplicate PackageReference items -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0' Or '$(TargetFramework)' == 'net6.0'">
+    <PackageReference Include="System.Text.Json" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
+    <PackageReference Include="System.Text.Json" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+  </ItemGroup>
+
+</Project>

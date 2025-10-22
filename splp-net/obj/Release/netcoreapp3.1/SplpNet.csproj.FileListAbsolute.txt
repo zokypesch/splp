@@ -1,0 +1,11 @@
+E:\perlinsos\splp\splp-net\bin\Release\netcoreapp3.1\SplpNet.deps.json
+E:\perlinsos\splp\splp-net\bin\Release\netcoreapp3.1\SplpNet.dll
+E:\perlinsos\splp\splp-net\bin\Release\netcoreapp3.1\SplpNet.pdb
+E:\perlinsos\splp\splp-net\obj\Release\netcoreapp3.1\SplpNet.csproj.AssemblyReference.cache
+E:\perlinsos\splp\splp-net\obj\Release\netcoreapp3.1\SplpNet.GeneratedMSBuildEditorConfig.editorconfig
+E:\perlinsos\splp\splp-net\obj\Release\netcoreapp3.1\SplpNet.AssemblyInfoInputs.cache
+E:\perlinsos\splp\splp-net\obj\Release\netcoreapp3.1\SplpNet.AssemblyInfo.cs
+E:\perlinsos\splp\splp-net\obj\Release\netcoreapp3.1\SplpNet.csproj.CoreCompileInputs.cache
+E:\perlinsos\splp\splp-net\obj\Release\netcoreapp3.1\SplpNet.sourcelink.json
+E:\perlinsos\splp\splp-net\obj\Release\netcoreapp3.1\SplpNet.dll
+E:\perlinsos\splp\splp-net\obj\Release\netcoreapp3.1\SplpNet.pdb
