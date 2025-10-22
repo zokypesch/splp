@@ -12,7 +12,7 @@ namespace SplpNet.Crypto;
 public static class EncryptionService
 {
     private const int KeyLength = 32; // 32 bytes = 256 bits
-    private const int IvLength = 16;  // 16 bytes IV
+    private const int IvLength = 12;  // 12 bytes IV (required by .NET AesGcm - 96 bits)
     private const int TagLength = 16; // 16 bytes tag (GCM default)
 
     /// <summary>
