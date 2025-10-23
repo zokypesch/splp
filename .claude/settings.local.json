@@ -11,7 +11,8 @@
       "Bash(bun:*)",
       "Bash(cat:*)",
       "Read(//mnt/d/project/**)",
-      "Bash(timeout 5 bun index.ts)"
+      "Bash(timeout 5 bun index.ts)",
+      "Bash(dotnet build:*)"
     ],
     "deny": [],
     "ask": []
