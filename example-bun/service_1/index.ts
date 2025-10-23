@@ -11,7 +11,7 @@ import type { KafkaConfig, EncryptedMessage } from '../../splp-bun/src/types/ind
 
 // Configuration
 const kafkaConfig: KafkaConfig = {
-  brokers: ['localhost:9092'],
+  brokers: ['10.70.1.23:9092'], // Match with publisher configuration
   clientId: 'dukcapil-service',
   groupId: 'service-1-group',
 };
@@ -71,8 +71,23 @@ async function main() {
       console.log('─'.repeat(60));
       console.log('📥 [DUKCAPIL] Menerima data dari Command Center');
 
+      // Debug: log raw message
+      console.log('  Debug - Raw message (first 200 chars):', messageValue.substring(0, 200));
+
+      // Parse message
+      const parsedMsg = JSON.parse(messageValue);
+      console.log('  Debug - Parsed message keys:', Object.keys(parsedMsg));
+
       // Parse and decrypt
-      const encryptedMsg: EncryptedMessage = JSON.parse(messageValue);
+      const encryptedMsg: EncryptedMessage = parsedMsg as EncryptedMessage;
+
+      // Debug: log message structure
+      console.log('  Debug - Message structure:');
+      console.log('    - request_id:', encryptedMsg.request_id ? 'present' : 'missing');
+      console.log('    - data:', encryptedMsg.data ? `present (${encryptedMsg.data.length} chars)` : 'missing');
+      console.log('    - iv:', encryptedMsg.iv ? `present (${encryptedMsg.iv.length} chars)` : 'missing');
+      console.log('    - tag:', encryptedMsg.tag ? `present (${encryptedMsg.tag.length} chars)` : 'missing');
+
       const { requestId, payload } = decryptPayload<BansosCitizenRequest>(
         encryptedMsg,
         encryptionKey

@@ -15,9 +15,6 @@ export {
 export { CircuitBreaker, CircuitState } from './lib/utils/circuit-breaker.js';
 export { RetryManager, RetryConfigs } from './lib/utils/retry-manager.js';
 
-// Monitoring & Health Checks
-export { HealthChecker, BuiltInHealthChecks } from './lib/monitoring/health-checker.js';
-
 // Types
 export type {
   KafkaConfig,

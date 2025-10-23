@@ -2,7 +2,7 @@ import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
 import type { EncryptedMessage } from '../../types/index.js';
 
 const ALGORITHM = 'aes-256-gcm';
-const IV_LENGTH = 12;
+const IV_LENGTH = 12; // Changed from 16 to 12 for .NET AesGcm compatibility (96 bits)
 const TAG_LENGTH = 16;
 
 /**
@@ -58,6 +58,27 @@ export function decryptPayload<T>(
   encryptedMessage: EncryptedMessage,
   encryptionKey: string
 ): { requestId: string; payload: T } {
+  // Validate input
+  if (!encryptedMessage) {
+    throw new Error('Encrypted message is null or undefined');
+  }
+
+  if (!encryptedMessage.iv) {
+    throw new Error('Encrypted message missing IV field');
+  }
+
+  if (!encryptedMessage.tag) {
+    throw new Error('Encrypted message missing tag field');
+  }
+
+  if (!encryptedMessage.data) {
+    throw new Error('Encrypted message missing data field');
+  }
+
+  if (!encryptedMessage.request_id) {
+    throw new Error('Encrypted message missing request_id field');
+  }
+
   // Convert hex key to buffer
   const key = Buffer.from(encryptionKey, 'hex');
 
@@ -65,20 +86,48 @@ export function decryptPayload<T>(
     throw new Error('Encryption key must be 32 bytes (64 hex characters) for AES-256');
   }
 
-  // Convert IV and tag from hex
-  const iv = Buffer.from(encryptedMessage.iv, 'hex');
-  const tag = Buffer.from(encryptedMessage.tag, 'hex');
+  // Convert IV and tag from hex with validation
+  let iv: Buffer;
+  let tag: Buffer;
+
+  try {
+    iv = Buffer.from(encryptedMessage.iv, 'hex');
+    if (iv.length !== IV_LENGTH) {
+      throw new Error(`IV must be ${IV_LENGTH} bytes, got ${iv.length} bytes (hex string was ${encryptedMessage.iv.length} chars)`);
+    }
+  } catch (error) {
+    throw new Error(`Invalid IV format: ${error instanceof Error ? error.message : String(error)}`);
+  }
+
+  try {
+    tag = Buffer.from(encryptedMessage.tag, 'hex');
+    if (tag.length !== TAG_LENGTH) {
+      throw new Error(`Tag must be ${TAG_LENGTH} bytes, got ${tag.length} bytes (hex string was ${encryptedMessage.tag.length} chars)`);
+    }
+  } catch (error) {
+    throw new Error(`Invalid tag format: ${error instanceof Error ? error.message : String(error)}`);
+  }
 
   // Create decipher
   const decipher = createDecipheriv(ALGORITHM, key, iv);
   decipher.setAuthTag(tag);
 
   // Decrypt the data
-  let decrypted = decipher.update(encryptedMessage.data, 'hex', 'utf8');
-  decrypted += decipher.final('utf8');
+  let decrypted: string;
+  try {
+    decrypted = decipher.update(encryptedMessage.data, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
+  } catch (error) {
+    throw new Error(`Decryption failed: ${error instanceof Error ? error.message : String(error)}`);
+  }
 
   // Parse JSON payload
-  const payload = JSON.parse(decrypted) as T;
+  let payload: T;
+  try {
+    payload = JSON.parse(decrypted) as T;
+  } catch (error) {
+    throw new Error(`Failed to parse decrypted payload as JSON: ${error instanceof Error ? error.message : String(error)}`);
+  }
 
   return {
     requestId: encryptedMessage.request_id,

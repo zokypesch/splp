@@ -10,7 +10,7 @@ import type { KafkaConfig } from '../../splp-bun/src/types/index.js';
 
 // Configuration
 const kafkaConfig: KafkaConfig = {
-  brokers: ['localhost:9092'],
+  brokers: ['10.70.1.23:9092'], // Match with main publisher configuration
   clientId: 'publisher-a-client',
   groupId: 'publisher-a-group',
 };

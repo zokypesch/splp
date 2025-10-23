@@ -8,8 +8,11 @@ return [
     */
     'kafka' => [
         'brokers' => explode(',', env('SPLP_KAFKA_BROKERS', '10.70.1.23:9092')),
-        'clientId' => env('SPLP_KAFKA_CLIENT_ID', 'laravel-app'),
-        'groupId' => env('SPLP_KAFKA_GROUP_ID', 'laravel-app-group'),
+        'clientId' => env('SPLP_KAFKA_CLIENT_ID', 'dukcapil-service'),
+        'groupId' => env('SPLP_KAFKA_GROUP_ID', 'service-1z-group'),
+        'requestTimeoutMs' => env('SPLP_KAFKA_REQUEST_TIMEOUT_MS', 30000),
+        'consumerTopic' => env('SPLP_KAFKA_CONSUMER_TOPIC', 'service-1-topic'),
+        'producerTopic' => env('SPLP_KAFKA_PRODUCER_TOPIC', 'command-center-inbox'),
     ],
 
     /*
@@ -20,7 +23,7 @@ return [
     'cassandra' => [
         'contactPoints' => explode(',', env('SPLP_CASSANDRA_CONTACT_POINTS', 'localhost')),
         'localDataCenter' => env('SPLP_CASSANDRA_LOCAL_DATA_CENTER', 'datacenter1'),
-        'keyspace' => env('SPLP_CASSANDRA_KEYSPACE', 'laravel_keyspace'),
+        'keyspace' => env('SPLP_CASSANDRA_KEYSPACE', 'service_1_keyspace'),
     ],
 
     /*
@@ -29,7 +32,18 @@ return [
     |--------------------------------------------------------------------------
     */
     'encryption' => [
-        'encryptionKey' => env('SPLP_ENCRYPTION_KEY', '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'),
+        'key' => env('SPLP_ENCRYPTION_KEY', 'b9c4d62e772f6e1a4f8e0a139f50d96f7aefb2dc098fe3c53ad22b4b3a9c9e7'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Service Configuration
+    |--------------------------------------------------------------------------
+    */
+    'service' => [
+        'name' => env('SPLP_SERVICE_NAME', 'Dukcapil Service'),
+        'version' => env('SPLP_SERVICE_VERSION', '1.0.0'),
+        'workerName' => env('SPLP_SERVICE_WORKER_NAME', 'service-1-publisher'),
     ],
 
     /*

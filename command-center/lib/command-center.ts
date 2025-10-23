@@ -95,7 +95,7 @@ export class CommandCenter {
     try {
       // Parse incoming message
       const incomingMsg: IncomingMessage = JSON.parse(messageValue);
-
+      console.log('original message:', incomingMsg);
       metadata.request_id = incomingMsg.request_id;
       metadata.worker_name = incomingMsg.worker_name;
 
@@ -107,6 +107,8 @@ export class CommandCenter {
       const route = this.schemaRegistry.getRoute(incomingMsg.worker_name);
 
       if (!route) {
+        console.error(`No route found for publisher: ${incomingMsg.worker_name}`);
+        console.log('Available routes:', this.schemaRegistry.getAllRoutes().map(r => r.sourcePublisher));
         throw new Error(`No route found for publisher: ${incomingMsg.worker_name}`);
       }
 

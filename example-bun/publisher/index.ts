@@ -16,7 +16,8 @@ const kafkaConfig: KafkaConfig = {
   groupId: 'kemensos-group',
 };
 
-const encryptionKey = 'b9c4d62e772f6e1a4f8e0a139f50d96f7aefb2dc098fe3c53ad22b4b3a9c9e7d';
+const encryptionKey = process.env.ENCRYPTION_KEY || generateEncryptionKey();
+console.log("using key: ", encryptionKey);
 
 interface BansosCitizenRequest {
   registrationId: string;
@@ -65,7 +66,7 @@ async function main() {
 
     // Encrypt payload
     const encrypted = encryptPayload(payload, encryptionKey, requestId);
-
+   
     // Create message for Command Center
     const message = {
       request_id: requestId,

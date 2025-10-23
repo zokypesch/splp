@@ -11,7 +11,7 @@ import type { KafkaConfig, EncryptedMessage } from '../../splp-bun/src/types/ind
 
 // Configuration
 const kafkaConfig: KafkaConfig = {
-  brokers: ['localhost:9092'],
+  brokers: ['10.70.1.23:9092'], // Match with publisher configuration
   clientId: 'bpjs-kesehatan-service',
   groupId: 'service-1b-group', // UNIQUE GROUP
 };
