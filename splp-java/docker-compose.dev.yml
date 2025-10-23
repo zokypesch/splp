@@ -1,0 +1,207 @@
+version: '3.8'
+
+# Development environment with additional tools and debugging capabilities
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    container_name: splp-dev-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      # Enable JMX for monitoring
+      KAFKA_JMX_PORT: 9999
+      KAFKA_JMX_HOSTNAME: localhost
+    ports:
+      - "2181:2181"
+      - "9999:9999"
+    volumes:
+      - zookeeper_dev_data:/var/lib/zookeeper/data
+      - zookeeper_dev_logs:/var/lib/zookeeper/log
+    networks:
+      - splp-dev-network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: splp-dev-kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+      - "9998:9998"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_HOST://localhost:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
+      KAFKA_NUM_PARTITIONS: 3
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 1
+      # Development settings
+      KAFKA_LOG_RETENTION_HOURS: 24
+      KAFKA_LOG_SEGMENT_BYTES: 104857600
+      KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS: 60000
+      # Enable JMX for monitoring
+      KAFKA_JMX_PORT: 9998
+      KAFKA_JMX_HOSTNAME: localhost
+      # Enable debug logging
+      KAFKA_LOG4J_LOGGERS: "kafka.controller=DEBUG,kafka.producer.async.DefaultEventHandler=DEBUG,state.change.logger=DEBUG"
+    volumes:
+      - kafka_dev_data:/var/lib/kafka/data
+      - kafka_dev_logs:/var/lib/kafka/logs
+    networks:
+      - splp-dev-network
+
+  cassandra:
+    image: cassandra:4.1
+    container_name: splp-dev-cassandra
+    ports:
+      - "9042:9042"
+      - "7000:7000"
+      - "7199:7199"  # JMX port
+    environment:
+      CASSANDRA_CLUSTER_NAME: splp-dev-cluster
+      CASSANDRA_DC: datacenter1
+      CASSANDRA_RACK: rack1
+      CASSANDRA_ENDPOINT_SNITCH: GossipingPropertyFileSnitch
+      CASSANDRA_NUM_TOKENS: 256
+      # Development memory settings (smaller for local dev)
+      MAX_HEAP_SIZE: 512M
+      HEAP_NEWSIZE: 100M
+      # Enable JMX
+      LOCAL_JMX: no
+      # Development settings
+      CASSANDRA_CONCURRENT_READS: 16
+      CASSANDRA_CONCURRENT_WRITES: 16
+      CASSANDRA_CONCURRENT_COUNTER_WRITES: 16
+    volumes:
+      - cassandra_dev_data:/var/lib/cassandra
+      - ./src/test/resources/cassandra-init.cql:/docker-entrypoint-initdb.d/init.cql
+      - ./dev/cassandra/cassandra.yaml:/etc/cassandra/cassandra.yaml:ro
+    networks:
+      - splp-dev-network
+
+  # Kafka UI for development
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: splp-dev-kafka-ui
+    depends_on:
+      - kafka
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: splp-dev-cluster
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+      KAFKA_CLUSTERS_0_JMXPORT: 9998
+      # Enable all features for development
+      AUTH_TYPE: "DISABLED"
+      MANAGEMENT_HEALTH_LDAP_ENABLED: false
+    networks:
+      - splp-dev-network
+
+  # Cassandra Web UI for development
+  cassandra-web:
+    image: ipushc/cassandra-web:latest
+    container_name: splp-dev-cassandra-web
+    depends_on:
+      - cassandra
+    ports:
+      - "3000:3000"
+    environment:
+      CASSANDRA_HOST: cassandra
+      CASSANDRA_PORT: 9042
+      CASSANDRA_USER: cassandra
+      CASSANDRA_PASSWORD: cassandra
+    networks:
+      - splp-dev-network
+
+  # Redis for caching (optional development tool)
+  redis:
+    image: redis:7-alpine
+    container_name: splp-dev-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --requirepass devpassword
+    volumes:
+      - redis_dev_data:/data
+    networks:
+      - splp-dev-network
+
+  # Prometheus for metrics collection (development monitoring)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: splp-dev-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./dev/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_dev_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - splp-dev-network
+
+  # Grafana for metrics visualization (development monitoring)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: splp-dev-grafana
+    ports:
+      - "3001:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: false
+    volumes:
+      - grafana_dev_data:/var/lib/grafana
+      - ./dev/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./dev/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    networks:
+      - splp-dev-network
+
+  # Jaeger for distributed tracing (development)
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: splp-dev-jaeger
+    ports:
+      - "16686:16686"  # Jaeger UI
+      - "14268:14268"  # Jaeger collector HTTP
+      - "14250:14250"  # Jaeger collector gRPC
+      - "6831:6831/udp"  # Jaeger agent UDP
+    environment:
+      COLLECTOR_OTLP_ENABLED: true
+    networks:
+      - splp-dev-network
+
+volumes:
+  kafka_dev_data:
+    driver: local
+  kafka_dev_logs:
+    driver: local
+  zookeeper_dev_data:
+    driver: local
+  zookeeper_dev_logs:
+    driver: local
+  cassandra_dev_data:
+    driver: local
+  redis_dev_data:
+    driver: local
+  prometheus_dev_data:
+    driver: local
+  grafana_dev_data:
+    driver: local
+
+networks:
+  splp-dev-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16

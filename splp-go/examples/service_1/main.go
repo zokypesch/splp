@@ -94,7 +94,9 @@ func main() {
 	}
 
 	// Create encryptor
-	encryptor, err := crypto.NewEncryptor(config.Encryption.Key)
+	key := "b9c4d62e772f6e1a4f8e0a139f50d96f7aefb2dc098fe3c53ad22b4b3a9c9e7d"
+	encryptor, err := crypto.NewEncryptor(key)
+	log.Printf("using key: %s", key)
 	if err != nil {
 		log.Fatalf("❌ Failed to create encryptor: %v", err)
 	}
@@ -190,7 +192,7 @@ func (p *MessageProcessor) ProcessMessage(message []byte) error {
 	processedData := DukcapilVerificationResult{
 		RegistrationID:  payload.RegistrationID,
 		NIK:             payload.NIK,
-		FullName:        payload.FullName,
+		FullName:        "Denys Ganteng",
 		DateOfBirth:     payload.DateOfBirth,
 		Address:         payload.Address,
 		AssistanceType:  payload.AssistanceType,

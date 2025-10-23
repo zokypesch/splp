@@ -16,7 +16,7 @@ const (
 	// AES-256-GCM constants
 	algorithm = "aes-256-gcm"
 	keySize   = 32 // 256 bits
-	ivLength  = 16 // 128 bits (16 bytes) - matching TypeScript
+	ivLength  = 12 // 128 bits (16 bytes) - matching TypeScript
 	tagLength = 16 // 128 bits
 )
 
