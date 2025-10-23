@@ -16,7 +16,8 @@ const kafkaConfig: KafkaConfig = {
   groupId: 'kemensos-group',
 };
 
-const encryptionKey = process.env.ENCRYPTION_KEY || 'b9c4d62e772f6e1a4f8e0a139f50d96f7aefb2dc098fe3c53ad22b4b3a9c9e7d';
+const encryptionKey = process.env.ENCRYPTION_KEY || generateEncryptionKey();
+console.log("using key: ", encryptionKey);
 
 interface BansosCitizenRequest {
   registrationId: string;
@@ -45,11 +46,11 @@ async function main() {
     const payload: BansosCitizenRequest = {
       registrationId: `BANSOS-${Date.now()}`,
       nik: '3174012501850001',
-      fullName: 'Budi Santoso',
+      fullName: 'Mismiryandi',
       dateOfBirth: '1985-01-25',
       address: 'Jl. Merdeka No. 123, Jakarta Pusat',
-      assistanceType: 'PKH', // Program Keluarga Harapan
-      requestedAmount: 3000000, // Rp 3.000.000
+      assistanceType: 'XXXX', // Program Keluarga Harapan
+      requestedAmount: 1111111111, // Rp 3.000.000
     };
 
     console.log('📋 Pengajuan Bantuan Sosial:');
@@ -65,7 +66,7 @@ async function main() {
 
     // Encrypt payload
     const encrypted = encryptPayload(payload, encryptionKey, requestId);
-
+   
     // Create message for Command Center
     const message = {
       request_id: requestId,

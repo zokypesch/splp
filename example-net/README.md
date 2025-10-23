@@ -103,6 +103,7 @@ set ENCRYPTION_KEY=your-generated-key-here
 
 ```bash
 cd E:\perlinsos\splp\example-net
+dotnet restore --force
 dotnet build
 ```
 

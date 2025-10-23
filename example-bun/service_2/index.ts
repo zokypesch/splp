@@ -11,12 +11,12 @@ import type { KafkaConfig, EncryptedMessage } from '../../splp-bun/src/types/ind
 
 // Configuration
 const kafkaConfig: KafkaConfig = {
-  brokers: ['10.70.1.23:9092'], // Match with publisher configuration
+  brokers: ['10.70.1.23:9092'],
   clientId: 'kemensos-aggregation',
   groupId: 'service-2-group',
 };
 
-const encryptionKey = process.env.ENCRYPTION_KEY || generateEncryptionKey();
+const encryptionKey = "b9c4d62e772f6e1a4f8e0a139f50d96f7aefb2dc098fe3c53ad22b4b3a9c9e7d";
 // const encryptionKey = "a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b27796d93e0078";
 
 // Base interface for all verification results
@@ -75,6 +75,8 @@ interface BankIndonesiaResult extends BaseVerificationResult {
   notes?: string;
 }
 
+let counter = 0;
+
 type VerificationResult = DukcapilResult | BPJSTKResult | BPJSKesehatanResult | BankIndonesiaResult;
 
 async function main() {
@@ -96,6 +98,8 @@ async function main() {
   console.log('');
   console.log('Expected: 4 hasil verifikasi untuk setiap pengajuan\n');
 
+  console.log('🔍 DEBUG: About to subscribe to service-2-topic');
+
   // Subscribe to service-2-topic (Command Center routes here)
   await kafka.subscribe(['service-2-topic'], async ({ topic, message }) => {
     const startTime = Date.now();
@@ -107,24 +111,39 @@ async function main() {
       console.log('═'.repeat(60));
       console.log('📬 FINAL MESSAGE RECEIVED');
       console.log('═'.repeat(60));
+      counter++;
+      console.log('Counter:', counter);
+      // console.log('Partition:', message.partition);
+      console.log('Offset:', message.offset);
 
       // Parse and decrypt
       const encryptedMsg: EncryptedMessage = JSON.parse(messageValue);
+
+      // Debug: Check if message has worker_name (from RoutedMessage)
+      const parsedMsg = JSON.parse(messageValue) as any;
+      if (parsedMsg.worker_name) {
+        console.log('🔍 DEBUG: Message from worker:', parsedMsg.worker_name);
+      }
+
       const { requestId, payload } = decryptPayload<VerificationResult>(
         encryptedMsg,
         encryptionKey
       );
 
       console.log('');
+      console.log('🔍 DEBUG: Decrypted payload type:', typeof payload);
+      console.log('🔍 DEBUG: Decrypted payload keys:', payload ? Object.keys(payload) : 'null/undefined');
+      console.log('🔍 DEBUG: Full payload:', JSON.stringify(payload, null, 2));
+      console.log('');
       console.log('📋 Data Pemohon Bantuan:');
       console.log('  Request ID:', requestId);
-      console.log('  Registration ID:', payload.registrationId);
-      console.log('  NIK:', payload.nik);
-      console.log('  Nama:', payload.fullName);
-      console.log('  Tanggal Lahir:', payload.dateOfBirth);
-      console.log('  Alamat:', payload.address);
-      console.log('  Jenis Bantuan:', payload.assistanceType);
-      console.log('  Jumlah Diminta: Rp', payload.requestedAmount.toLocaleString('id-ID'));
+      console.log('  Registration ID:', payload?.registrationId);
+      console.log('  NIK:', payload?.nik);
+      console.log('  Nama:', payload?.fullName);
+      console.log('  Tanggal Lahir:', payload?.dateOfBirth);
+      console.log('  Alamat:', payload?.address);
+      console.log('  Jenis Bantuan:', payload?.assistanceType);
+      console.log('  Jumlah Diminta: Rp', payload?.requestedAmount?.toLocaleString('id-ID'));
       console.log('');
       console.log('📥 Hasil Verifikasi dari:', payload.processedBy.toUpperCase());
       console.log('  Waktu Verifikasi:', new Date(payload.verifiedAt).toLocaleString('id-ID'));

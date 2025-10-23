@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "akZzDysvlW8=",
+  "dgSpecHash": "omvpygyHVRE=",
   "success": true,
   "projectFilePath": "E:\\perlinsos\\splp\\splp-net\\SplpNet.csproj",
   "expectedPackageFiles": [
@@ -71,9 +71,9 @@
     "C:\\Users\\Ryan\\.nuget\\packages\\system.threading.tasks.extensions\\4.0.0\\system.threading.tasks.extensions.4.0.0.nupkg.sha512",
     "C:\\Users\\Ryan\\.nuget\\packages\\system.xml.readerwriter\\4.0.11\\system.xml.readerwriter.4.0.11.nupkg.sha512",
     "C:\\Users\\Ryan\\.nuget\\packages\\system.xml.xdocument\\4.0.11\\system.xml.xdocument.4.0.11.nupkg.sha512",
-    "C:\\Users\\Ryan\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\3.1.10\\microsoft.aspnetcore.app.ref.3.1.10.nupkg.sha512",
     "C:\\Users\\Ryan\\.nuget\\packages\\microsoft.netcore.app.ref\\3.1.0\\microsoft.netcore.app.ref.3.1.0.nupkg.sha512",
-    "C:\\Users\\Ryan\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\3.1.0\\microsoft.windowsdesktop.app.ref.3.1.0.nupkg.sha512"
+    "C:\\Users\\Ryan\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\3.1.0\\microsoft.windowsdesktop.app.ref.3.1.0.nupkg.sha512",
+    "C:\\Users\\Ryan\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\3.1.10\\microsoft.aspnetcore.app.ref.3.1.10.nupkg.sha512"
   ],
   "logs": []
 }

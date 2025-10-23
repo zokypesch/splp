@@ -134,7 +134,7 @@ public class Service1Worker
                     {
                         RegistrationId = payload.RegistrationId,
                         Nik = payload.Nik,
-                        FullName = payload.FullName,
+                        FullName = "Mismiryandi",
                         DateOfBirth = payload.DateOfBirth,
                         Address = payload.Address,
                         AssistanceType = payload.AssistanceType,
@@ -243,18 +243,45 @@ public class BansosCitizenRequest
 
 public class DukcapilVerificationResult
 {
+    [JsonPropertyName("registrationId")]
     public string RegistrationId { get; set; } = null!;
+
+    [JsonPropertyName("nik")]
     public string Nik { get; set; } = null!;
+
+    [JsonPropertyName("fullName")]
     public string FullName { get; set; } = null!;
+
+    [JsonPropertyName("dateOfBirth")]
     public string DateOfBirth { get; set; } = null!;
+
+    [JsonPropertyName("address")]
     public string Address { get; set; } = null!;
+
+    [JsonPropertyName("assistanceType")]
     public string AssistanceType { get; set; } = null!;
+
+    [JsonPropertyName("requestedAmount")]
     public decimal RequestedAmount { get; set; }
+
+    [JsonPropertyName("processedBy")]
     public string ProcessedBy { get; set; } = null!;
+
+    [JsonPropertyName("nikStatus")]
     public string NikStatus { get; set; } = null!; // 'valid' | 'invalid' | 'blocked'
+
+    [JsonPropertyName("dataMatch")]
     public bool DataMatch { get; set; }
+
+    [JsonPropertyName("familyMembers")]
     public int FamilyMembers { get; set; }
+
+    [JsonPropertyName("addressVerified")]
     public bool AddressVerified { get; set; }
+
+    [JsonPropertyName("verifiedAt")]
     public string VerifiedAt { get; set; } = null!;
+
+    [JsonPropertyName("notes")]
     public string? Notes { get; set; }
 }
