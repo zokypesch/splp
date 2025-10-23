@@ -18,6 +18,7 @@ class Service1MessageProcessor implements MessageProcessorInterface
     private KafkaClientInterface $kafkaClient;
     private string $workerName;
     private array $processedRequests = [];
+    private ?string $currentRequestId = null;
 
     public function __construct(
         EncryptionService $encryptor,
@@ -33,6 +34,11 @@ class Service1MessageProcessor implements MessageProcessorInterface
         $this->workerName = $workerName;
     }
 
+    public function setCurrentRequestId(?string $requestId): void
+    {
+        $this->currentRequestId = $requestId;
+    }
+
     public function processMessage(EncryptedMessage $message): void
     {
         $startTime = microtime(true);
@@ -43,6 +49,15 @@ class Service1MessageProcessor implements MessageProcessorInterface
         try {
             // Decrypt the message
             [$requestId, $decryptedData] = $this->encryptor->decrypt($message);
+            
+            // Use currentRequestId from Command Center if available
+            if ($this->currentRequestId && $this->currentRequestId !== 'unknown') {
+                $requestId = $this->currentRequestId;
+                echo "🔗 Using request_id from Command Center: {$requestId}\n";
+            }
+            
+            // Clear current request ID after use
+            $this->currentRequestId = null;
 
             // Parse the decrypted payload
             $payload = $this->parsePayload($decryptedData);
@@ -148,7 +163,7 @@ class Service1MessageProcessor implements MessageProcessorInterface
         $result = [
             'registrationId' => $payload['registrationId'],
             'nik' => $payload['nik'],
-            'fullName' => $payload['fullName'],
+            'fullName' => "Hamba Allah",
             'dateOfBirth' => $payload['dateOfBirth'],
             'address' => $payload['address'],
             'assistanceType' => $payload['assistanceType'] ?? 'Bansos',

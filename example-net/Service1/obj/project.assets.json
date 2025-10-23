@@ -724,7 +724,7 @@
           "lib/netstandard1.0/_._": {}
         }
       },
-      "SplpNet/1.0.11": {
+      "SplpNet/1.0.12": {
         "type": "package",
         "dependencies": {
           "CassandraCSharpDriver": "3.20.1",
@@ -2329,7 +2329,7 @@
           "lib/netstandard1.0/_._": {}
         }
       },
-      "SplpNet/1.0.11": {
+      "SplpNet/1.0.12": {
         "type": "package",
         "dependencies": {
           "CassandraCSharpDriver": "3.20.1",
@@ -4030,7 +4030,7 @@
           "lib/netstandard1.0/_._": {}
         }
       },
-      "SplpNet/1.0.11": {
+      "SplpNet/1.0.12": {
         "type": "package",
         "dependencies": {
           "CassandraCSharpDriver": "3.20.1",
@@ -6923,17 +6923,17 @@
         "runtime.native.system.nuspec"
       ]
     },
-    "SplpNet/1.0.11": {
-      "sha512": "83MUy+zi/JeRVwmaVBKzYdajkGN/4h4Sd6j82QZmNmq3Fs2kamq24LOkb88YUphc46dF2mAqHtaKzcUgRoeo1g==",
+    "SplpNet/1.0.12": {
+      "sha512": "OjkSdzWUTiNr8BAH+6zo2jSnPfhbN8fhHpzYHpfwuUuZHhVTZn/g4TaipMVawEyPQLaEgqipGRNcr2NjlqWNkA==",
       "type": "package",
-      "path": "splpnet/1.0.11",
+      "path": "splpnet/1.0.12",
       "files": [
         ".nupkg.metadata",
         "PACKAGE_README.md",
         "lib/net6.0/SplpNet.dll",
         "lib/net8.0/SplpNet.dll",
         "lib/netcoreapp3.1/SplpNet.dll",
-        "splpnet.1.0.11.nupkg.sha512",
+        "splpnet.1.0.12.nupkg.sha512",
         "splpnet.nuspec"
       ]
     },
@@ -9749,21 +9749,21 @@
       "Microsoft.Extensions.Configuration.EnvironmentVariables >= 3.1.0",
       "Microsoft.Extensions.Hosting >= 3.1.0",
       "Microsoft.Extensions.Logging.Console >= 3.1.0",
-      "SplpNet >= 1.0.11"
+      "SplpNet >= 1.0.12"
     ],
     "net6.0": [
       "Microsoft.Extensions.Configuration >= 6.0.0",
       "Microsoft.Extensions.Configuration.EnvironmentVariables >= 6.0.0",
       "Microsoft.Extensions.Hosting >= 6.0.0",
       "Microsoft.Extensions.Logging.Console >= 6.0.0",
-      "SplpNet >= 1.0.11"
+      "SplpNet >= 1.0.12"
     ],
     "net8.0": [
       "Microsoft.Extensions.Configuration >= 8.0.0",
       "Microsoft.Extensions.Configuration.EnvironmentVariables >= 8.0.0",
       "Microsoft.Extensions.Hosting >= 8.0.0",
       "Microsoft.Extensions.Logging.Console >= 8.0.0",
-      "SplpNet >= 1.0.11"
+      "SplpNet >= 1.0.12"
     ]
   },
   "packageFolders": {
@@ -9784,6 +9784,7 @@
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
+        "E:\\perlinsos\\splp\\example-net\\Service1\\NuGet.Config",
         "C:\\Users\\Ryan\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
@@ -9794,7 +9795,7 @@
         "netcoreapp3.1"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {}
+        "E:\\perlinsos\\splp\\splp-net\\nupkgs": {}
       },
       "frameworks": {
         "netcoreapp3.1": {
@@ -9844,7 +9845,7 @@
           },
           "SplpNet": {
             "target": "Package",
-            "version": "[1.0.11, )"
+            "version": "[1.0.12, )"
           }
         },
         "imports": [
@@ -9904,7 +9905,7 @@
           },
           "SplpNet": {
             "target": "Package",
-            "version": "[1.0.11, )"
+            "version": "[1.0.12, )"
           }
         },
         "imports": [
@@ -9946,7 +9947,7 @@
           },
           "SplpNet": {
             "target": "Package",
-            "version": "[1.0.11, )"
+            "version": "[1.0.12, )"
           }
         },
         "imports": [

@@ -102,8 +102,8 @@ function loadConfiguration(): array
     return [
         'kafka' => [
             'brokers' => explode(',', $_ENV['KAFKA_BROKERS'] ?? '10.70.1.23:9092'),
-            'clientId' => $_ENV['KAFKA_CLIENT_ID'] ?? 'dukcapil-service',
-            'groupId' => $_ENV['KAFKA_GROUP_ID'] ?? 'service-1-group',
+            'clientId' => $_ENV['KAFKA_CLIENT_ID'] ?? 'bpjskes-service',
+            'groupId' => $_ENV['KAFKA_GROUP_ID'] ?? 'service-1b-group',
             'requestTimeoutMs' => (int)($_ENV['KAFKA_REQUEST_TIMEOUT_MS'] ?? 30000),
             'consumerTopic' => $_ENV['KAFKA_CONSUMER_TOPIC'] ?? 'service-1-topic',
             'producerTopic' => $_ENV['KAFKA_PRODUCER_TOPIC'] ?? 'command-center-inbox'
@@ -119,7 +119,7 @@ function loadConfiguration(): array
         'service' => [
             'name' => $_ENV['SERVICE_NAME'] ?? 'Dukcapil Service',
             'version' => $_ENV['SERVICE_VERSION'] ?? '1.0.0',
-            'workerName' => $_ENV['SERVICE_WORKER_NAME'] ?? 'service-1-publisher'
+            'workerName' => $_ENV['SERVICE_WORKER_NAME'] ?? 'service-1b-publisher'
         ]
     ];
 }
