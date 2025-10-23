@@ -6,7 +6,7 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v6.0": {
-      "SplpNet/1.0.11": {
+      "SplpNet/1.0.12": {
         "dependencies": {
           "CassandraCSharpDriver": "3.20.1",
           "Confluent.Kafka": "2.3.0",
@@ -719,7 +719,7 @@
     }
   },
   "libraries": {
-    "SplpNet/1.0.11": {
+    "SplpNet/1.0.12": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

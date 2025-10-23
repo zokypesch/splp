@@ -20,21 +20,25 @@ public static class EncryptionService
     /// </summary>
     public static EncryptedMessage EncryptPayload<T>(T payload, string encryptionKeyHex, string requestId)
     {
+        // Convert hex key to bytes
         byte[] key = HexToBytes(encryptionKeyHex);
         if (key.Length != KeyLength)
-            throw new ArgumentException("Encryption key must be 32 bytes (64 hex characters).");
+            throw new ArgumentException("Encryption key must be 32 bytes (64 hex characters) for AES-256");
 
         // Generate random IV
-        Span<byte> iv = stackalloc byte[IvLength];
-        RandomNumberGenerator.Fill(iv);
+        byte[] iv = new byte[IvLength];
+        using (var rng = RandomNumberGenerator.Create())
+        {
+            rng.GetBytes(iv);
+        }
 
-        // Convert payload to UTF-8 JSON
+        // Convert payload to JSON string
         string json = JsonSerializer.Serialize(payload);
-        ReadOnlySpan<byte> plaintext = Encoding.UTF8.GetBytes(json);
+        byte[] plaintext = Encoding.UTF8.GetBytes(json);
 
         // Output buffers
-        Span<byte> ciphertext = new byte[plaintext.Length];
-        Span<byte> tag = stackalloc byte[TagLength];
+        byte[] ciphertext = new byte[plaintext.Length];
+        byte[] tag = new byte[TagLength];
 
         using (var aesGcm = new AesGcm(key))
         {
@@ -43,7 +47,7 @@ public static class EncryptionService
 
         return new EncryptedMessage
         {
-            RequestId = requestId,
+            RequestId = requestId, // Not encrypted for tracing
             Data = BytesToHex(ciphertext),
             Iv = BytesToHex(iv),
             Tag = BytesToHex(tag)
@@ -55,21 +59,24 @@ public static class EncryptionService
     /// </summary>
     public static (string RequestId, T Payload) DecryptPayload<T>(EncryptedMessage encrypted, string encryptionKeyHex)
     {
+        // Convert hex key to buffer
         byte[] key = HexToBytes(encryptionKeyHex);
         if (key.Length != KeyLength)
-            throw new ArgumentException("Encryption key must be 32 bytes (64 hex characters).");
+            throw new ArgumentException("Encryption key must be 32 bytes (64 hex characters) for AES-256");
 
-        ReadOnlySpan<byte> iv = HexToBytes(encrypted.Iv);
-        ReadOnlySpan<byte> tag = HexToBytes(encrypted.Tag);
-        ReadOnlySpan<byte> ciphertext = HexToBytes(encrypted.Data);
+        // Convert IV and tag from hex
+        byte[] iv = HexToBytes(encrypted.Iv);
+        byte[] tag = HexToBytes(encrypted.Tag);
+        byte[] ciphertext = HexToBytes(encrypted.Data);
 
-        Span<byte> plaintext = new byte[ciphertext.Length];
+        byte[] plaintext = new byte[ciphertext.Length];
 
         using (var aesGcm = new AesGcm(key))
         {
             aesGcm.Decrypt(iv, ciphertext, tag, plaintext);
         }
 
+        // Parse JSON payload
         string json = Encoding.UTF8.GetString(plaintext);
         T payload = JsonSerializer.Deserialize<T>(json)!;
 
@@ -92,9 +99,9 @@ public static class EncryptionService
     /// <summary>
     /// Converts byte array to hex string (compatible with older .NET versions)
     /// </summary>
-    private static string BytesToHex(ReadOnlySpan<byte> bytes)
+    private static string BytesToHex(byte[] bytes)
     {
-        return BitConverter.ToString(bytes.ToArray()).Replace("-", "").ToLower();
+        return BitConverter.ToString(bytes).Replace("-", "").ToLower();
     }
 
     /// <summary>

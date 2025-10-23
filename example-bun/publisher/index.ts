@@ -45,11 +45,11 @@ async function main() {
     const payload: BansosCitizenRequest = {
       registrationId: `BANSOS-${Date.now()}`,
       nik: '3174012501850001',
-      fullName: 'Budi Santoso',
+      fullName: 'Mismiryandi',
       dateOfBirth: '1985-01-25',
       address: 'Jl. Merdeka No. 123, Jakarta Pusat',
-      assistanceType: 'PKH', // Program Keluarga Harapan
-      requestedAmount: 3000000, // Rp 3.000.000
+      assistanceType: 'XXXX', // Program Keluarga Harapan
+      requestedAmount: 1111111111, // Rp 3.000.000
     };
 
     console.log('📋 Pengajuan Bantuan Sosial:');

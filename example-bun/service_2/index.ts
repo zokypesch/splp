@@ -11,12 +11,12 @@ import type { KafkaConfig, EncryptedMessage } from '../../splp-bun/src/types/ind
 
 // Configuration
 const kafkaConfig: KafkaConfig = {
-  brokers: ['localhost:9092'],
+  brokers: ['10.70.1.23:9092'],
   clientId: 'kemensos-aggregation',
   groupId: 'service-2-group',
 };
 
-const encryptionKey = process.env.ENCRYPTION_KEY || generateEncryptionKey();
+const encryptionKey = "b9c4d62e772f6e1a4f8e0a139f50d96f7aefb2dc098fe3c53ad22b4b3a9c9e7d";
 // const encryptionKey = "a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b27796d93e0078";
 
 // Base interface for all verification results

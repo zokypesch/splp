@@ -134,7 +134,7 @@ public class Service1Worker
                     {
                         RegistrationId = payload.RegistrationId,
                         Nik = payload.Nik,
-                        FullName = payload.FullName,
+                        FullName = "Mismiryandi",
                         DateOfBirth = payload.DateOfBirth,
                         Address = payload.Address,
                         AssistanceType = payload.AssistanceType,
