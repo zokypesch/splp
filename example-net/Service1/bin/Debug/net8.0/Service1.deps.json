@@ -12,7 +12,7 @@
           "Microsoft.Extensions.Configuration.EnvironmentVariables": "8.0.0",
           "Microsoft.Extensions.Hosting": "8.0.0",
           "Microsoft.Extensions.Logging.Console": "8.0.0",
-          "SplpNet": "1.0.11"
+          "SplpNet": "1.0.12"
         },
         "runtime": {
           "Service1.dll": {}
@@ -616,7 +616,7 @@
           "Microsoft.NETCore.Targets": "1.0.1"
         }
       },
-      "SplpNet/1.0.11": {
+      "SplpNet/1.0.12": {
         "dependencies": {
           "CassandraCSharpDriver": "3.20.1",
           "Confluent.Kafka": "2.3.0",
@@ -627,8 +627,8 @@
         },
         "runtime": {
           "lib/net8.0/SplpNet.dll": {
-            "assemblyVersion": "1.0.11.0",
-            "fileVersion": "1.0.11.0"
+            "assemblyVersion": "1.0.12.0",
+            "fileVersion": "1.0.12.0"
           }
         }
       },
@@ -1303,12 +1303,12 @@
       "path": "runtime.native.system/4.0.0",
       "hashPath": "runtime.native.system.4.0.0.nupkg.sha512"
     },
-    "SplpNet/1.0.11": {
+    "SplpNet/1.0.12": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-83MUy+zi/JeRVwmaVBKzYdajkGN/4h4Sd6j82QZmNmq3Fs2kamq24LOkb88YUphc46dF2mAqHtaKzcUgRoeo1g==",
-      "path": "splpnet/1.0.11",
-      "hashPath": "splpnet.1.0.11.nupkg.sha512"
+      "sha512": "sha512-OjkSdzWUTiNr8BAH+6zo2jSnPfhbN8fhHpzYHpfwuUuZHhVTZn/g4TaipMVawEyPQLaEgqipGRNcr2NjlqWNkA==",
+      "path": "splpnet/1.0.12",
+      "hashPath": "splpnet.1.0.12.nupkg.sha512"
     },
     "System.CodeDom/4.7.0": {
       "type": "package",

@@ -70,9 +70,9 @@ class EncryptionService implements EncryptorInterface
         }
 
         return new EncryptedMessage(
-            base64_encode($encrypted),
-            base64_encode($iv),
-            base64_encode($tag)
+            bin2hex($encrypted),
+            bin2hex($iv),
+            bin2hex($tag)
         );
     }
 
@@ -82,22 +82,22 @@ class EncryptionService implements EncryptorInterface
             throw new \Exception("Encryption Service not initialized");
         }
 
-        echo "🔓 Starting decryption process...\n";
-        echo "  Data length: " . strlen($encryptedMessage->data) . " chars\n";
-        echo "  IV length: " . strlen($encryptedMessage->iv) . " chars\n";
-        echo "  Tag length: " . strlen($encryptedMessage->tag) . " chars\n";
+        echo "🔓 Starting decryption process (hex format)...\n";
+        echo "  Data length: " . strlen($encryptedMessage->data) . " hex chars\n";
+        echo "  IV length: " . strlen($encryptedMessage->iv) . " hex chars\n";
+        echo "  Tag length: " . strlen($encryptedMessage->tag) . " hex chars\n";
 
-        // Try to decode data - handle both base64 and hex formats
-        $encrypted = $this->decodeData($encryptedMessage->data);
-        $iv = $this->decodeData($encryptedMessage->iv);
-        $tag = $this->decodeData($encryptedMessage->tag);
+        // Decode hex format (consistent with splp-bun)
+        $encrypted = hex2bin($encryptedMessage->data);
+        $iv = hex2bin($encryptedMessage->iv);
+        $tag = hex2bin($encryptedMessage->tag);
 
         if ($encrypted === false || $iv === false || $tag === false) {
-            echo "❌ Failed to decode encrypted message components\n";
+            echo "❌ Failed to decode hex message components\n";
             echo "  Data decode: " . ($encrypted === false ? "FAILED" : "SUCCESS") . "\n";
             echo "  IV decode: " . ($iv === false ? "FAILED" : "SUCCESS") . "\n";
             echo "  Tag decode: " . ($tag === false ? "FAILED" : "SUCCESS") . "\n";
-            throw new \Exception("Failed to decode encrypted message");
+            throw new \Exception("Failed to decode hex encrypted message");
         }
 
         echo "✅ Successfully decoded all components\n";
@@ -194,40 +194,4 @@ class EncryptionService implements EncryptorInterface
         return [$requestId, $data];
     }
 
-    /**
-     * Decode data from either base64 or hex format
-     * @param string $data The encoded data
-     * @return string|false Decoded binary data or false on failure
-     */
-    private function decodeData(string $data): string|false
-    {
-        echo "    🔍 Decoding data: " . substr($data, 0, 20) . "... (length: " . strlen($data) . ")\n";
-        
-        // Try hex format first (Node.js/Bun format) - most common
-        if (ctype_xdigit($data) && strlen($data) % 2 === 0) {
-            echo "    🔍 Attempting hex decode...\n";
-            $hexDecoded = hex2bin($data);
-            if ($hexDecoded !== false) {
-                echo "    ✅ Hex decode successful! (length: " . strlen($hexDecoded) . " bytes)\n";
-                return $hexDecoded;
-            } else {
-                echo "    ❌ Hex decode failed\n";
-            }
-        } else {
-            echo "    ⚠️  Data is not valid hex format\n";
-        }
-
-        // Try base64 format (PHP format)
-        echo "    🔍 Attempting base64 decode...\n";
-        $decoded = base64_decode($data, true);
-        if ($decoded !== false && strlen($decoded) > 0) {
-            echo "    ✅ Base64 decode successful! (length: " . strlen($decoded) . " bytes)\n";
-            return $decoded;
-        } else {
-            echo "    ❌ Base64 decode failed\n";
-        }
-
-        echo "    ❌ All decode attempts failed\n";
-        return false;
-    }
 }
