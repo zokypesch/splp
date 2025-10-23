@@ -724,6 +724,23 @@
           "lib/netstandard1.0/_._": {}
         }
       },
+      "SplpNet/1.0.11": {
+        "type": "package",
+        "dependencies": {
+          "CassandraCSharpDriver": "3.20.1",
+          "Confluent.Kafka": "2.3.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "6.0.0",
+          "Microsoft.Extensions.Logging.Abstractions": "6.0.0",
+          "Microsoft.Extensions.Options": "6.0.0",
+          "System.Text.Json": "6.0.0"
+        },
+        "compile": {
+          "lib/netcoreapp3.1/SplpNet.dll": {}
+        },
+        "runtime": {
+          "lib/netcoreapp3.1/SplpNet.dll": {}
+        }
+      },
       "System.Buffers/4.5.1": {
         "type": "package",
         "compile": {
@@ -1520,24 +1537,6 @@
         "runtime": {
           "lib/netstandard1.3/System.Xml.XDocument.dll": {}
         }
-      },
-      "SplpNet/1.0.3": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v3.1",
-        "dependencies": {
-          "CassandraCSharpDriver": "3.20.1",
-          "Confluent.Kafka": "2.3.0",
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "6.0.0",
-          "Microsoft.Extensions.Logging.Abstractions": "6.0.0",
-          "Microsoft.Extensions.Options": "6.0.0",
-          "System.Text.Json": "6.0.0"
-        },
-        "compile": {
-          "bin/placeholder/SplpNet.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/SplpNet.dll": {}
-        }
       }
     },
     "net6.0": {
@@ -2328,6 +2327,23 @@
         },
         "runtime": {
           "lib/netstandard1.0/_._": {}
+        }
+      },
+      "SplpNet/1.0.11": {
+        "type": "package",
+        "dependencies": {
+          "CassandraCSharpDriver": "3.20.1",
+          "Confluent.Kafka": "2.3.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.0",
+          "Microsoft.Extensions.Logging.Abstractions": "8.0.0",
+          "Microsoft.Extensions.Options": "8.0.0",
+          "System.Text.Json": "8.0.0"
+        },
+        "compile": {
+          "lib/net6.0/SplpNet.dll": {}
+        },
+        "runtime": {
+          "lib/net6.0/SplpNet.dll": {}
         }
       },
       "System.CodeDom/4.7.0": {
@@ -3143,24 +3159,6 @@
         },
         "runtime": {
           "lib/netstandard1.3/System.Xml.XDocument.dll": {}
-        }
-      },
-      "SplpNet/1.0.3": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v6.0",
-        "dependencies": {
-          "CassandraCSharpDriver": "3.20.1",
-          "Confluent.Kafka": "2.3.0",
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.0",
-          "Microsoft.Extensions.Logging.Abstractions": "8.0.0",
-          "Microsoft.Extensions.Options": "8.0.0",
-          "System.Text.Json": "8.0.0"
-        },
-        "compile": {
-          "bin/placeholder/SplpNet.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/SplpNet.dll": {}
         }
       }
     },
@@ -4032,6 +4030,23 @@
           "lib/netstandard1.0/_._": {}
         }
       },
+      "SplpNet/1.0.11": {
+        "type": "package",
+        "dependencies": {
+          "CassandraCSharpDriver": "3.20.1",
+          "Confluent.Kafka": "2.3.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.0",
+          "Microsoft.Extensions.Logging.Abstractions": "8.0.0",
+          "Microsoft.Extensions.Options": "8.0.0",
+          "System.Text.Json": "8.0.0"
+        },
+        "compile": {
+          "lib/net8.0/SplpNet.dll": {}
+        },
+        "runtime": {
+          "lib/net8.0/SplpNet.dll": {}
+        }
+      },
       "System.CodeDom/4.7.0": {
         "type": "package",
         "compile": {
@@ -4822,24 +4837,6 @@
         },
         "runtime": {
           "lib/netstandard1.3/System.Xml.XDocument.dll": {}
-        }
-      },
-      "SplpNet/1.0.3": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v8.0",
-        "dependencies": {
-          "CassandraCSharpDriver": "3.20.1",
-          "Confluent.Kafka": "2.3.0",
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.0",
-          "Microsoft.Extensions.Logging.Abstractions": "8.0.0",
-          "Microsoft.Extensions.Options": "8.0.0",
-          "System.Text.Json": "8.0.0"
-        },
-        "compile": {
-          "bin/placeholder/SplpNet.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/SplpNet.dll": {}
         }
       }
     }
@@ -6924,6 +6921,20 @@
         "lib/netstandard1.0/_._",
         "runtime.native.system.4.0.0.nupkg.sha512",
         "runtime.native.system.nuspec"
+      ]
+    },
+    "SplpNet/1.0.11": {
+      "sha512": "83MUy+zi/JeRVwmaVBKzYdajkGN/4h4Sd6j82QZmNmq3Fs2kamq24LOkb88YUphc46dF2mAqHtaKzcUgRoeo1g==",
+      "type": "package",
+      "path": "splpnet/1.0.11",
+      "files": [
+        ".nupkg.metadata",
+        "PACKAGE_README.md",
+        "lib/net6.0/SplpNet.dll",
+        "lib/net8.0/SplpNet.dll",
+        "lib/netcoreapp3.1/SplpNet.dll",
+        "splpnet.1.0.11.nupkg.sha512",
+        "splpnet.nuspec"
       ]
     },
     "System.Buffers/4.5.1": {
@@ -9730,11 +9741,6 @@
         "system.xml.xdocument.4.0.11.nupkg.sha512",
         "system.xml.xdocument.nuspec"
       ]
-    },
-    "SplpNet/1.0.3": {
-      "type": "project",
-      "path": "../../splp-net/SplpNet.csproj",
-      "msbuildProject": "../../splp-net/SplpNet.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -9743,21 +9749,21 @@
       "Microsoft.Extensions.Configuration.EnvironmentVariables >= 3.1.0",
       "Microsoft.Extensions.Hosting >= 3.1.0",
       "Microsoft.Extensions.Logging.Console >= 3.1.0",
-      "SplpNet >= 1.0.3"
+      "SplpNet >= 1.0.11"
     ],
     "net6.0": [
       "Microsoft.Extensions.Configuration >= 6.0.0",
       "Microsoft.Extensions.Configuration.EnvironmentVariables >= 6.0.0",
       "Microsoft.Extensions.Hosting >= 6.0.0",
       "Microsoft.Extensions.Logging.Console >= 6.0.0",
-      "SplpNet >= 1.0.3"
+      "SplpNet >= 1.0.11"
     ],
     "net8.0": [
       "Microsoft.Extensions.Configuration >= 8.0.0",
       "Microsoft.Extensions.Configuration.EnvironmentVariables >= 8.0.0",
       "Microsoft.Extensions.Hosting >= 8.0.0",
       "Microsoft.Extensions.Logging.Console >= 8.0.0",
-      "SplpNet >= 1.0.3"
+      "SplpNet >= 1.0.11"
     ]
   },
   "packageFolders": {
@@ -9793,27 +9799,15 @@
       "frameworks": {
         "netcoreapp3.1": {
           "targetAlias": "netcoreapp3.1",
-          "projectReferences": {
-            "E:\\perlinsos\\splp\\splp-net\\SplpNet.csproj": {
-              "projectPath": "E:\\perlinsos\\splp\\splp-net\\SplpNet.csproj"
-            }
-          }
+          "projectReferences": {}
         },
         "net6.0": {
           "targetAlias": "net6.0",
-          "projectReferences": {
-            "E:\\perlinsos\\splp\\splp-net\\SplpNet.csproj": {
-              "projectPath": "E:\\perlinsos\\splp\\splp-net\\SplpNet.csproj"
-            }
-          }
+          "projectReferences": {}
         },
         "net8.0": {
           "targetAlias": "net8.0",
-          "projectReferences": {
-            "E:\\perlinsos\\splp\\splp-net\\SplpNet.csproj": {
-              "projectPath": "E:\\perlinsos\\splp\\splp-net\\SplpNet.csproj"
-            }
-          }
+          "projectReferences": {}
         }
       },
       "warningProperties": {
@@ -9847,6 +9841,10 @@
           "Microsoft.Extensions.Logging.Console": {
             "target": "Package",
             "version": "[3.1.0, )"
+          },
+          "SplpNet": {
+            "target": "Package",
+            "version": "[1.0.11, )"
           }
         },
         "imports": [
@@ -9903,6 +9901,10 @@
           "Microsoft.Extensions.Logging.Console": {
             "target": "Package",
             "version": "[6.0.0, )"
+          },
+          "SplpNet": {
+            "target": "Package",
+            "version": "[1.0.11, )"
           }
         },
         "imports": [
@@ -9941,6 +9943,10 @@
           "Microsoft.Extensions.Logging.Console": {
             "target": "Package",
             "version": "[8.0.0, )"
+          },
+          "SplpNet": {
+            "target": "Package",
+            "version": "[1.0.11, )"
           }
         },
         "imports": [

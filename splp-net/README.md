@@ -27,11 +27,12 @@ A comprehensive .NET library for implementing Request-Reply patterns over Kafka 
 # Complete workflow create nupkg in one go:
 
 ```bash
+# update version first in SplpNet.csproj
 cd E:\perlinsos\splp\splp-net
 dotnet clean
 dotnet restore --source https://api.nuget.org/v3/index.json
 dotnet build --configuration Release --no-restore
-dotnet pack --configuration Release --output .\nupkgs
+dotnet pack --configuration Release --output nupkgs
 ```
 
 # Verify creation:

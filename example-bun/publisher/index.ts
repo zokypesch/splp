@@ -11,12 +11,12 @@ import type { KafkaConfig } from '../../splp-bun/src/types/index.js';
 
 // Configuration
 const kafkaConfig: KafkaConfig = {
-  brokers: ['localhost:9092'],
+  brokers: ['10.70.1.23:9092'],
   clientId: 'kemensos-publisher',
   groupId: 'kemensos-group',
 };
 
-const encryptionKey = process.env.ENCRYPTION_KEY || generateEncryptionKey();
+const encryptionKey = 'b9c4d62e772f6e1a4f8e0a139f50d96f7aefb2dc098fe3c53ad22b4b3a9c9e7d';
 
 interface BansosCitizenRequest {
   registrationId: string;

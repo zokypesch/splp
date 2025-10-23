@@ -18,7 +18,6 @@
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "E:\\perlinsos\\splp\\example-net\\Service1\\NuGet.Config",
           "C:\\Users\\Ryan\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
@@ -29,7 +28,7 @@
           "netcoreapp3.1"
         ],
         "sources": {
-          "E:\\perlinsos\\splp\\splp-net\\nupkgs": {}
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {}
         },
         "frameworks": {
           "netcoreapp3.1": {
@@ -79,7 +78,7 @@
             },
             "SplpNet": {
               "target": "Package",
-              "version": "[1.0.6, )"
+              "version": "[1.0.11, )"
             }
           },
           "imports": [
@@ -139,7 +138,7 @@
             },
             "SplpNet": {
               "target": "Package",
-              "version": "[1.0.6, )"
+              "version": "[1.0.11, )"
             }
           },
           "imports": [
@@ -181,7 +180,7 @@
             },
             "SplpNet": {
               "target": "Package",
-              "version": "[1.0.6, )"
+              "version": "[1.0.11, )"
             }
           },
           "imports": [
