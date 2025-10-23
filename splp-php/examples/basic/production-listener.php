@@ -74,7 +74,8 @@ try {
     echo "✓ Dukcapil terhubung ke Kafka\n";
     echo "✓ Listening on topic: {$config['kafka']['consumerTopic']} (group: {$config['kafka']['groupId']})\n";
     echo "✓ Producer topic: {$config['kafka']['producerTopic']}\n";
-    echo "✓ Siap memverifikasi data kependudukan dan mengirim hasil ke Command Center\n\n";
+    echo "✓ Siap memverifikasi data kependudukan dan mengirim hasil ke Command Center\n";
+    echo "✓ Menunggu pesan dari Command Center...\n\n";
 
     // Start consuming
     $kafkaWrapper->startConsuming([$config['kafka']['consumerTopic']]);
@@ -102,7 +103,7 @@ function loadConfiguration(): array
         'kafka' => [
             'brokers' => explode(',', $_ENV['KAFKA_BROKERS'] ?? '10.70.1.23:9092'),
             'clientId' => $_ENV['KAFKA_CLIENT_ID'] ?? 'dukcapil-service',
-            'groupId' => $_ENV['KAFKA_GROUP_ID'] ?? 'service-1z-group',
+            'groupId' => $_ENV['KAFKA_GROUP_ID'] ?? 'service-1-group',
             'requestTimeoutMs' => (int)($_ENV['KAFKA_REQUEST_TIMEOUT_MS'] ?? 30000),
             'consumerTopic' => $_ENV['KAFKA_CONSUMER_TOPIC'] ?? 'service-1-topic',
             'producerTopic' => $_ENV['KAFKA_PRODUCER_TOPIC'] ?? 'command-center-inbox'
@@ -113,12 +114,12 @@ function loadConfiguration(): array
             'keyspace' => $_ENV['CASSANDRA_KEYSPACE'] ?? 'service_1_keyspace'
         ],
         'encryption' => [
-            'key' => $_ENV['ENCRYPTION_KEY'] ?? 'b9c4d62e772f6e1a4f8e0a139f50d96f7aefb2dc098fe3c53ad22b4b3a9c9e7'
+            'key' => $_ENV['ENCRYPTION_KEY'] ?? 'b9c4d62e772f6e1a4f8e0a139f50d96f7aefb2dc098fe3c53ad22b4b3a9c9e7d'
         ],
         'service' => [
             'name' => $_ENV['SERVICE_NAME'] ?? 'Dukcapil Service',
             'version' => $_ENV['SERVICE_VERSION'] ?? '1.0.0',
-            'workerName' => $_ENV['SERVICE_WORKER_NAME'] ?? 'service-1-publisher'
+            'workerName' => $_ENV['SERVICE_WORKER_NAME'] ?? 'initial-publisher'
         ]
     ];
 }

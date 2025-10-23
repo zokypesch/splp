@@ -111,6 +111,9 @@ class KafkaWrapper implements KafkaClientInterface
         // Set error callback
         $this->producerConf->setErrorCb(function ($kafka, $err, $reason) {
             echo "❌ Producer error: {$err} - {$reason}\n";
+            echo "   Kafka instance: " . get_class($kafka) . "\n";
+            echo "   Error code: {$err}\n";
+            echo "   Reason: {$reason}\n";
         });
         
         // Set delivery report callback
@@ -124,6 +127,11 @@ class KafkaWrapper implements KafkaClientInterface
 
         $this->producer = new \RdKafka\Producer($this->producerConf);
         echo "✅ Kafka Producer initialized\n";
+        echo "   Client ID: {$this->config->clientId}-producer\n";
+        echo "   Brokers: " . implode(', ', $this->config->brokers) . "\n";
+        echo "   Request Timeout: {$this->config->requestTimeoutMs}ms\n";
+        echo "   ACKs: all\n";
+        echo "   Retries: 5\n";
     }
 
     private function initializeConsumer(): void
@@ -144,6 +152,9 @@ class KafkaWrapper implements KafkaClientInterface
         // Set error callback
         $this->consumerConf->setErrorCb(function ($kafka, $err, $reason) {
             echo "❌ Consumer error: {$err} - {$reason}\n";
+            echo "   Kafka instance: " . get_class($kafka) . "\n";
+            echo "   Error code: {$err}\n";
+            echo "   Reason: {$reason}\n";
         });
         
         // Set rebalance callback
@@ -151,14 +162,21 @@ class KafkaWrapper implements KafkaClientInterface
             switch ($err) {
                 case \RD_KAFKA_RESP_ERR__ASSIGN_PARTITIONS:
                     echo "📋 Assigning partitions: " . count($partitions) . " partitions\n";
+                    foreach ($partitions as $partition) {
+                        echo "   - Topic: {$partition->getTopic()}, Partition: {$partition->getPartition()}\n";
+                    }
                     $kafka->assign($partitions);
                     break;
                 case \RD_KAFKA_RESP_ERR__REVOKE_PARTITIONS:
                     echo "📋 Revoking partitions: " . count($partitions) . " partitions\n";
+                    foreach ($partitions as $partition) {
+                        echo "   - Topic: {$partition->getTopic()}, Partition: {$partition->getPartition()}\n";
+                    }
                     $kafka->assign(null);
                     break;
                 default:
                     echo "❌ Rebalance error: {$err}\n";
+                    echo "   Partitions: " . ($partitions ? count($partitions) : 'null') . "\n";
                     $kafka->assign(null);
                     break;
             }
@@ -166,6 +184,16 @@ class KafkaWrapper implements KafkaClientInterface
 
         $this->consumer = new \RdKafka\KafkaConsumer($this->consumerConf);
         echo "✅ Kafka Consumer initialized\n";
+        echo "   Group ID: {$this->config->groupId}\n";
+        echo "   Client ID: {$this->config->clientId}-consumer\n";
+        echo "   Brokers: " . implode(', ', $this->config->brokers) . "\n";
+        echo "   Auto Offset Reset: earliest\n";
+        echo "   Enable Auto Commit: true\n";
+        echo "   Session Timeout: 30000ms\n";
+        echo "   Heartbeat Interval: 3000ms\n";
+        echo "   Auto Commit Interval: 1000ms\n";
+        echo "   Message Timeout: 1000ms\n";
+        echo "   Enable Auto Commit: true\n";
     }
 
     public function setMessageHandler(MessageProcessorInterface $handler): void
@@ -192,7 +220,9 @@ class KafkaWrapper implements KafkaClientInterface
             echo "Press Ctrl+C to stop.\n\n";
 
             // Subscribe to topics
+            echo "📋 Subscribing to topics: " . implode(', ', $topics) . "\n";
             $this->consumer->subscribe($topics);
+            echo "✅ Successfully subscribed to topics\n";
 
             // Start consuming loop
             $this->consumerLoop();
@@ -208,11 +238,16 @@ class KafkaWrapper implements KafkaClientInterface
 
     private function consumerLoop(): void
     {
+        $pollCount = 0;
         while ($this->consuming) {
             try {
                 $message = $this->consumer->consume(1000); // 1 second timeout
+                $pollCount++;
                 
                 if ($message === null) {
+                    if ($pollCount % 10 === 0) { // Log every 10 polls (10 seconds)
+                        echo "⏳ Polling for messages... (poll #{$pollCount})\n";
+                    }
                     continue; // No message, continue polling
                 }
                 
@@ -220,19 +255,57 @@ class KafkaWrapper implements KafkaClientInterface
                     case \RD_KAFKA_RESP_ERR_NO_ERROR:
                         // Successfully received message
                         echo "📥 Received message from topic: {$message->topic_name}, partition: {$message->partition}, offset: {$message->offset}\n";
+                        echo "📦 Message size: " . strlen($message->payload) . " bytes\n";
                         
                         // Create EncryptedMessage from received data
                         $messageData = json_decode($message->payload, true);
                         if ($messageData === null) {
                             echo "❌ Failed to decode message JSON\n";
+                            echo "Raw payload: " . substr($message->payload, 0, 200) . "...\n";
+                            echo "JSON error: " . json_last_error_msg() . "\n";
                             break;
                         }
                         
-                        $encryptedMessage = new EncryptedMessage(
-                            $messageData['data'] ?? '',
-                            $messageData['iv'] ?? '',
-                            $messageData['tag'] ?? ''
-                        );
+                        echo "🔍 Message structure: " . implode(', ', array_keys($messageData)) . "\n";
+                        
+                        // Handle different message formats
+                        $data = '';
+                        $iv = '';
+                        $tag = '';
+                        
+                        if (isset($messageData['data']) && isset($messageData['iv']) && isset($messageData['tag'])) {
+                            // Command Center RoutedMessage format: { request_id, worker_name, source_topic, data, iv, tag }
+                            $data = $messageData['data'];
+                            $iv = $messageData['iv'];
+                            $tag = $messageData['tag'];
+                            echo "✅ Using Command Center RoutedMessage format\n";
+                            if (isset($messageData['request_id'])) {
+                                echo "  Request ID: {$messageData['request_id']}\n";
+                            }
+                            if (isset($messageData['worker_name'])) {
+                                echo "  Worker Name: {$messageData['worker_name']}\n";
+                            }
+                            if (isset($messageData['source_topic'])) {
+                                echo "  Source Topic: {$messageData['source_topic']}\n";
+                            }
+                        } elseif (isset($messageData['encrypted_data']) && isset($messageData['encrypted_iv']) && isset($messageData['encrypted_tag'])) {
+                            // Alternative format: { encrypted_data, encrypted_iv, encrypted_tag }
+                            $data = $messageData['encrypted_data'];
+                            $iv = $messageData['encrypted_iv'];
+                            $tag = $messageData['encrypted_tag'];
+                            echo "✅ Using alternative format: encrypted_data, encrypted_iv, encrypted_tag\n";
+                        } else {
+                            echo "❌ Unknown message format\n";
+                            echo "Available keys: " . implode(', ', array_keys($messageData)) . "\n";
+                            echo "Expected: data, iv, tag OR encrypted_data, encrypted_iv, encrypted_tag\n";
+                            break;
+                        }
+                        
+                        echo "🔐 Encrypted data length: " . strlen($data) . " chars\n";
+                        echo "🔐 IV length: " . strlen($iv) . " chars\n";
+                        echo "🔐 Tag length: " . strlen($tag) . " chars\n";
+                        
+                        $encryptedMessage = new EncryptedMessage($data, $iv, $tag);
                         
                         // Process the message
                         if ($this->messageHandler) {
@@ -246,16 +319,33 @@ class KafkaWrapper implements KafkaClientInterface
                                     'offset' => $message->offset,
                                     'timestamp' => date('Y-m-d H:i:s')
                                 ]);
+
+                                // Log failed metadata
+                                $this->logger->logMetadata([
+                                    'request_id' => 'unknown',
+                                    'worker_name' => 'kafka-consumer',
+                                    'source_topic' => $message->topic_name,
+                                    'target_topic' => 'unknown',
+                                    'route_id' => 'unknown',
+                                    'message_type' => 'request',
+                                    'success' => false,
+                                    'error' => "Error in message handler: " . $e->getMessage(),
+                                    'processing_time_ms' => null
+                                ]);
                             }
                         }
                         break;
                         
                     case \RD_KAFKA_RESP_ERR__PARTITION_EOF:
                         // End of partition, continue polling
+                        echo "📋 End of partition reached\n";
                         break;
                         
                     case \RD_KAFKA_RESP_ERR__TIMED_OUT:
                         // Timeout, continue polling
+                        if ($pollCount % 10 === 0) { // Log every 10 timeouts (10 seconds)
+                            echo "⏳ Consumer timeout (poll #{$pollCount})\n";
+                        }
                         break;
                         
                     default:
@@ -272,10 +362,13 @@ class KafkaWrapper implements KafkaClientInterface
 
     private function simulationConsumerLoop(): void
     {
+        $messageCount = 0;
         while ($this->consuming) {
             // Simulate message reception every few seconds
             usleep(2000000); // 2 seconds
             if ($this->consuming) { // Check again in case shutdown was requested during usleep
+                $messageCount++;
+                echo "🔄 Simulation mode: Generating message #{$messageCount}\n";
                 $this->simulateIncomingMessage();
             }
         }
@@ -312,6 +405,19 @@ class KafkaWrapper implements KafkaClientInterface
                     'request_id' => $requestId,
                     'topic' => 'service-1-topic',
                     'timestamp' => date('Y-m-d H:i:s')
+                ]);
+
+                // Log failed metadata
+                $this->logger->logMetadata([
+                    'request_id' => $requestId,
+                    'worker_name' => 'simulation-consumer',
+                    'source_topic' => 'service-1-topic',
+                    'target_topic' => 'unknown',
+                    'route_id' => 'simulation-route',
+                    'message_type' => 'request',
+                    'success' => false,
+                    'error' => "Error in message handler: " . $e->getMessage(),
+                    'processing_time_ms' => null
                 ]);
             }
         }
@@ -362,6 +468,20 @@ class KafkaWrapper implements KafkaClientInterface
                 } catch (\Exception $e) {
                     echo "❌ Failed to publish message: " . $e->getMessage() . "\n";
                     $this->circuitBreaker->recordFailure();
+                    
+                    // Log failed metadata
+                    $this->logger->logMetadata([
+                        'request_id' => 'unknown',
+                        'worker_name' => 'kafka-producer',
+                        'source_topic' => 'unknown',
+                        'target_topic' => $topic,
+                        'route_id' => 'unknown',
+                        'message_type' => 'request',
+                        'success' => false,
+                        'error' => "Failed to publish message: " . $e->getMessage(),
+                        'processing_time_ms' => null
+                    ]);
+                    
                     throw $e;
                 }
             });
@@ -385,6 +505,20 @@ class KafkaWrapper implements KafkaClientInterface
                 } catch (\Exception $e) {
                     echo "❌ Failed to publish message: " . $e->getMessage() . "\n";
                     $this->circuitBreaker->recordFailure();
+                    
+                    // Log failed metadata
+                    $this->logger->logMetadata([
+                        'request_id' => 'unknown',
+                        'worker_name' => 'kafka-producer-simulation',
+                        'source_topic' => 'unknown',
+                        'target_topic' => $topic,
+                        'route_id' => 'simulation-route',
+                        'message_type' => 'request',
+                        'success' => false,
+                        'error' => "Failed to publish message: " . $e->getMessage(),
+                        'processing_time_ms' => null
+                    ]);
+                    
                     throw $e;
                 }
             });

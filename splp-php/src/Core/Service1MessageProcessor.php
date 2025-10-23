@@ -24,7 +24,7 @@ class Service1MessageProcessor implements MessageProcessorInterface
         CassandraLogger $logger,
         KafkaConfig $config,
         KafkaClientInterface $kafkaClient,
-        string $workerName = 'service-1-publisher'
+        string $workerName = 'initial-publisher'
     ) {
         $this->encryptor = $encryptor;
         $this->logger = $logger;
@@ -52,11 +52,13 @@ class Service1MessageProcessor implements MessageProcessorInterface
             echo "  NIK: {$payload['nik']}\n";
             echo "  Nama: {$payload['fullName']}\n";
             echo "  Tanggal Lahir: {$payload['dateOfBirth']}\n";
-            echo "  Alamat: {$payload['address']}\n\n";
+            echo "  Alamat: {$payload['address']}\n";
+            echo "  Jenis Bantuan: {$payload['assistanceType']}\n";
+            echo "  Nominal: Rp " . number_format($payload['requestedAmount'] ?? 0, 0, ',', '.') . "\n\n";
 
             // Verify population data
             echo "🔄 Memverifikasi data kependudukan...\n";
-            //usleep(1000000); // Simulate verification delay
+            usleep(500000); // Simulate verification delay (0.5 seconds)
 
             // Process the verification
             $result = $this->verifyPopulationData($payload, $requestId);
@@ -79,11 +81,38 @@ class Service1MessageProcessor implements MessageProcessorInterface
                 'processed'
             );
 
+            // Log metadata for Command Center
+            $this->logger->logMetadata([
+                'request_id' => $requestId,
+                'worker_name' => $this->workerName,
+                'source_topic' => $this->config->consumerTopic,
+                'target_topic' => $this->config->producerTopic,
+                'route_id' => 'route-service1-001',
+                'message_type' => 'response',
+                'success' => true,
+                'processing_time_ms' => (int)($duration * 1000)
+            ]);
+
         } catch (\Exception $e) {
             echo "❌ Error processing message: " . $e->getMessage() . "\n";
+            echo "Stack trace:\n" . $e->getTraceAsString() . "\n";
             $this->logger->logError($e->getMessage(), [
                 'request_id' => $requestId ?? 'unknown',
-                'timestamp' => date('Y-m-d H:i:s')
+                'timestamp' => date('Y-m-d H:i:s'),
+                'error_details' => $e->getTraceAsString()
+            ]);
+
+            // Log failed metadata
+            $this->logger->logMetadata([
+                'request_id' => $requestId ?? 'unknown',
+                'worker_name' => $this->workerName,
+                'source_topic' => $this->config->consumerTopic,
+                'target_topic' => $this->config->producerTopic,
+                'route_id' => 'route-service1-001',
+                'message_type' => 'response',
+                'success' => false,
+                'error' => $e->getMessage(),
+                'processing_time_ms' => null
             ]);
             
             // Don't throw the exception to prevent stopping the consumer
@@ -101,6 +130,10 @@ class Service1MessageProcessor implements MessageProcessorInterface
                 throw new \Exception("Missing required field: {$field}");
             }
         }
+
+        // Add default values for optional fields
+        $data['assistanceType'] = $data['assistanceType'] ?? 'Bansos';
+        $data['requestedAmount'] = $data['requestedAmount'] ?? 0;
 
         return $data;
     }
@@ -194,6 +227,19 @@ class Service1MessageProcessor implements MessageProcessorInterface
                 'target_topic' => $this->config->producerTopic,
                 'worker_name' => $this->workerName,
                 'timestamp' => date('Y-m-d H:i:s')
+            ]);
+
+            // Log failed metadata
+            $this->logger->logMetadata([
+                'request_id' => $requestId,
+                'worker_name' => $this->workerName,
+                'source_topic' => $this->config->consumerTopic,
+                'target_topic' => $this->config->producerTopic,
+                'route_id' => 'route-service1-001',
+                'message_type' => 'response',
+                'success' => false,
+                'error' => "Failed to send reply: " . $e->getMessage(),
+                'processing_time_ms' => null
             ]);
         }
     }

@@ -10,7 +10,7 @@ import { generateEncryptionKey } from '../splp-bun/src/index.js';
 // Configuration
 const config: CommandCenterConfig = {
   kafka: {
-    brokers: ['localhost:9092'],
+    brokers: ['10.70.1.23:9092'],
     clientId: 'command-center',
     groupId: 'command-center-group',
   },
@@ -20,7 +20,7 @@ const config: CommandCenterConfig = {
     keyspace: 'command_center',
   },
   encryption: {
-    encryptionKey: process.env.ENCRYPTION_KEY || generateEncryptionKey(),
+    encryptionKey: process.env.ENCRYPTION_KEY || 'b9c4d62e772f6e1a4f8e0a139f50d96f7aefb2dc098fe3c53ad22b4b3a9c9e7d',
   },
   commandCenter: {
     inboxTopic: 'command-center-inbox',
@@ -110,9 +110,33 @@ async function registerExampleRoutes(commandCenter: CommandCenter) {
 
   await registry.registerRoute(userRoute);
 
+  // Example Service 3: Service 1 (Dukcapil) - Initial Publisher Route
+  const service1Info: ServiceInfo = {
+    serviceName: 'service-1-dukcapil',
+    version: '1.0.0',
+    description: 'Dukcapil population data verification service',
+    endpoint: 'http://localhost:3003',
+    tags: ['dukcapil', 'verification', 'population'],
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+
+  const service1Route: RouteConfig = {
+    routeId: 'route-service1-001',
+    sourcePublisher: 'initial-publisher',
+    targetTopic: 'service-1-topic',
+    serviceInfo: service1Info,
+    enabled: true,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+
+  await registry.registerRoute(service1Route);
+
   console.log('✓ Registered routes:');
   console.log('  - calc-publisher -> calculate');
   console.log('  - user-publisher -> get-user');
+  console.log('  - initial-publisher -> service-1-topic');
   console.log('');
 }
 
