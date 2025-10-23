@@ -307,6 +307,14 @@ class KafkaWrapper implements KafkaClientInterface
                         
                         $encryptedMessage = new EncryptedMessage($data, $iv, $tag);
                         
+                        // Extract request_id from Command Center message if available
+                        $requestId = $messageData['request_id'] ?? 'unknown';
+                        
+                        // Store request_id in a way that Service1MessageProcessor can access it
+                        if ($this->messageHandler instanceof \Splp\Messaging\Core\Service1MessageProcessor) {
+                            $this->messageHandler->setCurrentRequestId($requestId);
+                        }
+                        
                         // Process the message
                         if ($this->messageHandler) {
                             try {
@@ -317,12 +325,13 @@ class KafkaWrapper implements KafkaClientInterface
                                     'topic' => $message->topic_name,
                                     'partition' => $message->partition,
                                     'offset' => $message->offset,
+                                    'request_id' => $requestId,
                                     'timestamp' => date('Y-m-d H:i:s')
                                 ]);
 
                                 // Log failed metadata
                                 $this->logger->logMetadata([
-                                    'request_id' => 'unknown',
+                                    'request_id' => $requestId,
                                     'worker_name' => 'kafka-consumer',
                                     'source_topic' => $message->topic_name,
                                     'target_topic' => 'unknown',
