@@ -10,7 +10,7 @@ import { generateEncryptionKey } from '../splp-bun/src/index.js';
 // Configuration
 const config: CommandCenterConfig = {
   kafka: {
-    brokers: ['localhost:9092'],
+    brokers: ['10.70.1.23:9092'],
     clientId: 'command-center-example',
     groupId: 'command-center-example-group',
   },

@@ -11,12 +11,13 @@ import type { KafkaConfig } from '../../splp-bun/src/types/index.js';
 
 // Configuration
 const kafkaConfig: KafkaConfig = {
-  brokers: ['localhost:9092'],
+  brokers: ['10.70.1.23:9092'],
   clientId: 'kemensos-publisher',
   groupId: 'kemensos-group',
 };
 
 const encryptionKey = process.env.ENCRYPTION_KEY || generateEncryptionKey();
+console.log("using key: ", encryptionKey);
 
 interface BansosCitizenRequest {
   registrationId: string;
@@ -65,7 +66,7 @@ async function main() {
 
     // Encrypt payload
     const encrypted = encryptPayload(payload, encryptionKey, requestId);
-
+   
     // Create message for Command Center
     const message = {
       request_id: requestId,

@@ -10,7 +10,8 @@
       "Bash(bun run:*)",
       "Bash(bun:*)",
       "Bash(cat:*)",
-      "Read(//mnt/d/project/**)"
+      "Read(//mnt/d/project/**)",
+      "Bash(timeout 5 bun index.ts)"
     ],
     "deny": [],
     "ask": []

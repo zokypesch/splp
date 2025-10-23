@@ -2,7 +2,7 @@ import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
 import type { EncryptedMessage } from '../../types/index.js';
 
 const ALGORITHM = 'aes-256-gcm';
-const IV_LENGTH = 16;
+const IV_LENGTH = 12; // Changed from 16 to 12 for .NET AesGcm compatibility (96 bits)
 const TAG_LENGTH = 16;
 
 /**
