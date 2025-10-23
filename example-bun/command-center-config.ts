@@ -15,7 +15,7 @@ const config: CommandCenterConfig = {
     groupId: 'command-center-example-group',
   },
   cassandra: {
-    contactPoints: ['localhost'],
+    contactPoints: ['localhost'], // Use localhost for Cassandra
     localDataCenter: 'datacenter1',
     keyspace: 'command_center',
   },
