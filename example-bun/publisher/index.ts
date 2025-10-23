@@ -16,7 +16,7 @@ const kafkaConfig: KafkaConfig = {
   groupId: 'kemensos-group',
 };
 
-const encryptionKey = 'b9c4d62e772f6e1a4f8e0a139f50d96f7aefb2dc098fe3c53ad22b4b3a9c9e7d';
+const encryptionKey = process.env.ENCRYPTION_KEY || 'b9c4d62e772f6e1a4f8e0a139f50d96f7aefb2dc098fe3c53ad22b4b3a9c9e7d';
 
 interface BansosCitizenRequest {
   registrationId: string;
