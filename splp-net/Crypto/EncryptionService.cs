@@ -40,7 +40,7 @@ public static class EncryptionService
         byte[] ciphertext = new byte[plaintext.Length];
         byte[] tag = new byte[TagLength];
 
-        using (var aesGcm = new AesGcm(key))
+        using (var aesGcm = new AesGcm(key, TagLength))
         {
             aesGcm.Encrypt(iv, plaintext, ciphertext, tag);
         }
@@ -71,7 +71,7 @@ public static class EncryptionService
 
         byte[] plaintext = new byte[ciphertext.Length];
 
-        using (var aesGcm = new AesGcm(key))
+        using (var aesGcm = new AesGcm(key, TagLength))
         {
             aesGcm.Decrypt(iv, ciphertext, tag, plaintext);
         }
