@@ -25,19 +25,16 @@ public static class EncryptionService
             throw new ArgumentException("Encryption key must be 32 bytes (64 hex characters).");
 
         // Generate random IV
-        byte[] iv = new byte[IvLength];
-        using (var rng = RandomNumberGenerator.Create())
-        {
-            rng.GetBytes(iv);
-        }
+        Span<byte> iv = stackalloc byte[IvLength];
+        RandomNumberGenerator.Fill(iv);
 
         // Convert payload to UTF-8 JSON
         string json = JsonSerializer.Serialize(payload);
-        byte[] plaintext = Encoding.UTF8.GetBytes(json);
+        ReadOnlySpan<byte> plaintext = Encoding.UTF8.GetBytes(json);
 
         // Output buffers
-        byte[] ciphertext = new byte[plaintext.Length];
-        byte[] tag = new byte[TagLength];
+        Span<byte> ciphertext = new byte[plaintext.Length];
+        Span<byte> tag = stackalloc byte[TagLength];
 
         using (var aesGcm = new AesGcm(key))
         {
@@ -62,11 +59,11 @@ public static class EncryptionService
         if (key.Length != KeyLength)
             throw new ArgumentException("Encryption key must be 32 bytes (64 hex characters).");
 
-        byte[] iv = HexToBytes(encrypted.Iv);
-        byte[] tag = HexToBytes(encrypted.Tag);
-        byte[] ciphertext = HexToBytes(encrypted.Data);
+        ReadOnlySpan<byte> iv = HexToBytes(encrypted.Iv);
+        ReadOnlySpan<byte> tag = HexToBytes(encrypted.Tag);
+        ReadOnlySpan<byte> ciphertext = HexToBytes(encrypted.Data);
 
-        byte[] plaintext = new byte[ciphertext.Length];
+        Span<byte> plaintext = new byte[ciphertext.Length];
 
         using (var aesGcm = new AesGcm(key))
         {
@@ -95,9 +92,9 @@ public static class EncryptionService
     /// <summary>
     /// Converts byte array to hex string (compatible with older .NET versions)
     /// </summary>
-    private static string BytesToHex(byte[] bytes)
+    private static string BytesToHex(ReadOnlySpan<byte> bytes)
     {
-        return BitConverter.ToString(bytes).Replace("-", "").ToLower();
+        return BitConverter.ToString(bytes.ToArray()).Replace("-", "").ToLower();
     }
 
     /// <summary>

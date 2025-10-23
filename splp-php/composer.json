@@ -26,6 +26,7 @@
         "ext-json": "*",
         "ext-openssl": "*",
         "ext-curl": "*",
+        "ext-rdkafka": "*",
         "monolog/monolog": "^3.0",
         "ramsey/uuid": "^4.7"
     },

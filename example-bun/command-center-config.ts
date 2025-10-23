@@ -15,12 +15,12 @@ const config: CommandCenterConfig = {
     groupId: 'command-center-example-group',
   },
   cassandra: {
-    contactPoints: ['localhost'],
+    contactPoints: ['localhost'], // Use localhost for Cassandra
     localDataCenter: 'datacenter1',
     keyspace: 'command_center',
   },
   encryption: {
-    encryptionKey: process.env.ENCRYPTION_KEY || generateEncryptionKey(),
+    encryptionKey: 'b9c4d62e772f6e1a4f8e0a139f50d96f7aefb2dc098fe3c53ad22b4b3a9c9e7d',
   },
   commandCenter: {
     inboxTopic: 'command-center-inbox',

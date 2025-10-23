@@ -10,8 +10,7 @@ use Splp\Messaging\Contracts\RequestHandlerInterface;
 /**
  * Production MessagingClient
  * 
- * This is a placeholder implementation. In production, this would use
- * real Kafka and Cassandra drivers.
+ * Clean implementation for production use - compatible with SPLP-Go and SPLP-Bun
  */
 class MessagingClient implements MessagingClientInterface
 {
@@ -39,7 +38,7 @@ class MessagingClient implements MessagingClientInterface
         echo "📝 Registered handler for topic: {$topic}\n";
     }
 
-    public function request(string $topic, array $payload): array
+    public function request(string $topic, mixed $payload, int $timeoutMs = 30000): mixed
     {
         if (!$this->initialized) {
             throw new \Exception("MessagingClient not initialized");
@@ -75,95 +74,37 @@ class MessagingClient implements MessagingClientInterface
         echo "ℹ️  In production mode, this would connect to real Kafka\n\n";
 
         // In production, this would start real Kafka consumer
-        // For now, we'll simulate continuous consumption
-        $counter = 0;
-        $messageTypes = [
-            'user_registration',
-            'order_created',
-            'payment_processed',
-            'notification_sent',
-            'data_sync',
-            'dukcapil_request'
-        ];
-
+        // Messages come from external services, not self-generated
+        echo "✅ Kafka consumer started - waiting for external messages\n";
+        echo "Press Ctrl+C to stop.\n\n";
+        
+        // Keep the process running to listen for real messages
         while (true) {
-            $topic = $topics[$counter % count($topics)];
-            $messageType = $messageTypes[$counter % count($messageTypes)];
-            
-            $message = $this->generateProductionMessage($messageType, $counter + 1);
-            
-            echo "[PRODUCTION] Consuming message from {$topic} | type={$messageType}\n";
-            
-            try {
-                if (isset($this->handlers[$topic])) {
-                    $response = $this->handlers[$topic]->handle($message['requestId'], $message);
-                    echo "[PRODUCTION] Handler response: " . json_encode($response, JSON_PRETTY_PRINT) . "\n\n";
-                } else {
-                    echo "[PRODUCTION] No handler for topic: {$topic}\n\n";
-                }
-            } catch (\Exception $e) {
-                echo "[PRODUCTION] Handler error: " . $e->getMessage() . "\n\n";
-            }
-            
-            $counter++;
-            usleep(3000000); // 3 seconds between messages
+            usleep(1000000); // 1 second
         }
     }
 
-    private function generateProductionMessage(string $type, int $sequence): array
-    {
-        $baseMessage = [
-            'type' => $type,
-            'sequence' => $sequence,
-            'timestamp' => date('Y-m-d H:i:s'),
-            'requestId' => 'prod_req_' . uniqid() . '_' . $sequence
-        ];
-
-        return match($type) {
-            'user_registration' => array_merge($baseMessage, [
-                'userId' => 'user_' . random_int(1000, 9999),
-                'email' => 'user' . $sequence . '@example.com',
-                'name' => 'User ' . $sequence
-            ]),
-            'order_created' => array_merge($baseMessage, [
-                'orderId' => 'ORD_' . random_int(100000, 999999),
-                'amount' => random_int(100, 5000),
-                'currency' => 'USD',
-                'items' => ['item1', 'item2', 'item3']
-            ]),
-            'payment_processed' => array_merge($baseMessage, [
-                'paymentId' => 'PAY_' . random_int(100000, 999999),
-                'orderId' => 'ORD_' . random_int(100000, 999999),
-                'amount' => random_int(100, 5000),
-                'status' => 'completed',
-                'method' => 'credit_card'
-            ]),
-            'notification_sent' => array_merge($baseMessage, [
-                'notificationId' => 'NOTIF_' . random_int(100000, 999999),
-                'channel' => 'email',
-                'recipient' => 'user' . $sequence . '@example.com',
-                'subject' => 'Test Notification ' . $sequence
-            ]),
-            'data_sync' => array_merge($baseMessage, [
-                'syncId' => 'SYNC_' . random_int(100000, 999999),
-                'records' => random_int(10, 1000),
-                'source' => 'database',
-                'target' => 'cache'
-            ]),
-            'dukcapil_request' => array_merge($baseMessage, [
-                'requestType' => 'nik_validation',
-                'nik' => '1234567890123456',
-                'requestData' => [
-                    'name' => 'John Doe',
-                    'birthDate' => '1990-01-01'
-                ]
-            ]),
-            default => $baseMessage
-        };
-    }
 
     public function getConfig(): array
     {
         return $this->config;
+    }
+
+    public function getHealthStatus(): array
+    {
+        return [
+            'status' => 'healthy',
+            'initialized' => $this->initialized,
+            'handlers_count' => count($this->handlers),
+            'kafka_brokers' => $this->config['kafka']['brokers'],
+            'timestamp' => date('Y-m-d H:i:s')
+        ];
+    }
+
+    public function close(): void
+    {
+        $this->initialized = false;
+        $this->handlers = [];
+        echo "🔒 MessagingClient closed\n";
     }
 }

@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "QyGsvwZUA/U=",
+  "dgSpecHash": "TUJ80LVWeLU=",
   "success": true,
   "projectFilePath": "E:\\perlinsos\\splp\\example-net\\Publisher\\Publisher.csproj",
   "expectedPackageFiles": [
@@ -87,7 +87,7 @@
     "C:\\Users\\Ryan\\.nuget\\packages\\microsoft.win32.registry\\4.7.0\\microsoft.win32.registry.4.7.0.nupkg.sha512",
     "C:\\Users\\Ryan\\.nuget\\packages\\newtonsoft.json\\9.0.1\\newtonsoft.json.9.0.1.nupkg.sha512",
     "C:\\Users\\Ryan\\.nuget\\packages\\runtime.native.system\\4.0.0\\runtime.native.system.4.0.0.nupkg.sha512",
-    "C:\\Users\\Ryan\\.nuget\\packages\\splpnet\\1.0.2\\splpnet.1.0.2.nupkg.sha512",
+    "C:\\Users\\Ryan\\.nuget\\packages\\splpnet\\1.0.11\\splpnet.1.0.11.nupkg.sha512",
     "C:\\Users\\Ryan\\.nuget\\packages\\system.buffers\\4.5.1\\system.buffers.4.5.1.nupkg.sha512",
     "C:\\Users\\Ryan\\.nuget\\packages\\system.codedom\\4.7.0\\system.codedom.4.7.0.nupkg.sha512",
     "C:\\Users\\Ryan\\.nuget\\packages\\system.collections\\4.0.11\\system.collections.4.0.11.nupkg.sha512",
