@@ -1,0 +1,6 @@
+E:\perlinsos\splp\example-net\Publisher\obj\Debug\net6.0\Publisher.csproj.AssemblyReference.cache
+E:\perlinsos\splp\example-net\Publisher\obj\Debug\net6.0\Publisher.GeneratedMSBuildEditorConfig.editorconfig
+E:\perlinsos\splp\example-net\Publisher\obj\Debug\net6.0\Publisher.AssemblyInfoInputs.cache
+E:\perlinsos\splp\example-net\Publisher\obj\Debug\net6.0\Publisher.AssemblyInfo.cs
+E:\perlinsos\splp\example-net\Publisher\obj\Debug\net6.0\Publisher.csproj.CoreCompileInputs.cache
+E:\perlinsos\splp\example-net\Publisher\obj\Debug\net6.0\Publisher.sourcelink.json

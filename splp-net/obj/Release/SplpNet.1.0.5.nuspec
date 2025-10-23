@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>SplpNet</id>
+    <version>1.0.5</version>
+    <authors>SPLP Team</authors>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <readme>PACKAGE_README.md</readme>
+    <description>A comprehensive .NET library for implementing Request-Reply patterns over Kafka with built-in AES-256-GCM encryption, distributed tracing, and Cassandra logging. Supports .NET 8.0, .NET 6.0, and .NET Standard 2.1.</description>
+    <releaseNotes>Initial release of SplpNet library with full Kafka request-reply support, AES-256-GCM encryption, and Cassandra logging.</releaseNotes>
+    <copyright>Copyright (c) 2024 SPLP Team</copyright>
+    <tags>kafka request-reply messaging cassandra tracing encryption aes distributed microservices</tags>
+    <repository type="git" url="https://github.com/your-org/splp-net" commit="79c24d797c800dc2a40ec3f6e844346e3e43df0d" />
+    <dependencies>
+      <group targetFramework=".NETCoreApp3.1">
+        <dependency id="CassandraCSharpDriver" version="3.20.1" exclude="Build,Analyzers" />
+        <dependency id="Confluent.Kafka" version="2.3.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.DependencyInjection.Abstractions" version="6.0.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Logging.Abstractions" version="6.0.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Options" version="6.0.0" exclude="Build,Analyzers" />
+        <dependency id="System.Text.Json" version="6.0.0" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework="net6.0">
+        <dependency id="CassandraCSharpDriver" version="3.20.1" exclude="Build,Analyzers" />
+        <dependency id="Confluent.Kafka" version="2.3.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.DependencyInjection.Abstractions" version="8.0.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Logging.Abstractions" version="8.0.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Options" version="8.0.0" exclude="Build,Analyzers" />
+        <dependency id="System.Text.Json" version="8.0.0" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework="net8.0">
+        <dependency id="CassandraCSharpDriver" version="3.20.1" exclude="Build,Analyzers" />
+        <dependency id="Confluent.Kafka" version="2.3.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.DependencyInjection.Abstractions" version="8.0.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Logging.Abstractions" version="8.0.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Options" version="8.0.0" exclude="Build,Analyzers" />
+        <dependency id="System.Text.Json" version="8.0.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="E:\perlinsos\splp\splp-net\bin\Release\net6.0\SplpNet.dll" target="lib\net6.0\SplpNet.dll" />
+    <file src="E:\perlinsos\splp\splp-net\bin\Release\net8.0\SplpNet.dll" target="lib\net8.0\SplpNet.dll" />
+    <file src="E:\perlinsos\splp\splp-net\bin\Release\netcoreapp3.1\SplpNet.dll" target="lib\netcoreapp3.1\SplpNet.dll" />
+    <file src="E:\perlinsos\splp\splp-net\PACKAGE_README.md" target="\PACKAGE_README.md" />
+  </files>
+</package>

@@ -1,0 +1,6 @@
+E:\perlinsos\splp\example-net\CommandCenter\obj\Debug\netcoreapp3.1\CommandCenter.csproj.AssemblyReference.cache
+E:\perlinsos\splp\example-net\CommandCenter\obj\Debug\netcoreapp3.1\CommandCenter.GeneratedMSBuildEditorConfig.editorconfig
+E:\perlinsos\splp\example-net\CommandCenter\obj\Debug\netcoreapp3.1\CommandCenter.AssemblyInfoInputs.cache
+E:\perlinsos\splp\example-net\CommandCenter\obj\Debug\netcoreapp3.1\CommandCenter.AssemblyInfo.cs
+E:\perlinsos\splp\example-net\CommandCenter\obj\Debug\netcoreapp3.1\CommandCenter.csproj.CoreCompileInputs.cache
+E:\perlinsos\splp\example-net\CommandCenter\obj\Debug\netcoreapp3.1\CommandCenter.sourcelink.json
