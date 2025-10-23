@@ -7,7 +7,7 @@
     <LangVersion>latest</LangVersion>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageId>SplpNet</PackageId>
-    <Version>1.0.6</Version>
+    <Version>1.0.11</Version>
     <Authors>SPLP Team</Authors>
     <Company>SPLP.Library</Company>
     <Product>SplpNet</Product>

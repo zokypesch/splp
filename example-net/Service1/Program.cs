@@ -7,12 +7,14 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
 using SplpNet;
 using SplpNet.Models;
 using SplpNet.RequestReply;
 using SplpNet.Kafka;
 using SplpNet.Crypto;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 var builder = Host.CreateDefaultBuilder(args)
     .ConfigureServices((hostContext, services) =>
@@ -28,7 +30,8 @@ var builder = Host.CreateDefaultBuilder(args)
 
 // Run the service
 var service = builder.Services.GetRequiredService<Service1Worker>();
-await service.RunAsync();
+var configuration = builder.Services.GetRequiredService<IConfiguration>();
+await service.RunAsync(configuration);
 
 public class Service1Worker
 {
@@ -41,7 +44,7 @@ public class Service1Worker
         _loggerFactory = loggerFactory;
     }
 
-    public async Task RunAsync()
+    public async Task RunAsync(IConfiguration configuration)
     {
         _logger.LogInformation("═══════════════════════════════════════════════════════════");
         _logger.LogInformation("🏛️  DUKCAPIL - Ditjen Kependudukan & Catatan Sipil");
@@ -65,9 +68,11 @@ public class Service1Worker
             },
             Encryption = new EncryptionConfig
             {
-                EncryptionKey = Environment.GetEnvironmentVariable("ENCRYPTION_KEY") ?? SplpNetFactory.GenerateEncryptionKey()
+                EncryptionKey = configuration.GetSection("MessagingConfig:Encryption:EncryptionKey").Value ?? "b9c4d62e772f6e1a4f8e0a139f50d96f7aefb2dc098fe3c53ad22b4b3a9c9e7d"
             }
         };
+        _logger.LogInformation("🔑 Encryption key: {Key}", config.Encryption.EncryptionKey);
+
 
         using var client = new MessagingClient(config, _loggerFactory);
         
@@ -176,7 +181,14 @@ public class Service1Worker
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "❌ Error processing message");
+                    _logger.LogError("❌ Error processing message");
+                    _logger.LogError("   Exception Type: {ExceptionType}", ex.GetType().Name);
+                    _logger.LogError("   Error Message: {ErrorMessage}", ex.Message);
+                    if (ex.InnerException != null)
+                    {
+                        _logger.LogError("   Inner Exception: {InnerException}", ex.InnerException.Message);
+                    }
+                    _logger.LogError("   Stack Trace: {StackTrace}", ex.StackTrace);
                 }
             });
 
@@ -207,12 +219,25 @@ public class Service1Worker
 
 public class BansosCitizenRequest
 {
+    [JsonPropertyName("registrationId")]
     public string RegistrationId { get; set; } = null!;
+    
+    [JsonPropertyName("nik")]
     public string Nik { get; set; } = null!;
+    
+    [JsonPropertyName("fullName")]
     public string FullName { get; set; } = null!;
+    
+    [JsonPropertyName("dateOfBirth")]
     public string DateOfBirth { get; set; } = null!;
+    
+    [JsonPropertyName("address")]
     public string Address { get; set; } = null!;
+    
+    [JsonPropertyName("assistanceType")]
     public string AssistanceType { get; set; } = null!;
+    
+    [JsonPropertyName("requestedAmount")]
     public decimal RequestedAmount { get; set; }
 }
 
