@@ -119,7 +119,7 @@ function loadConfiguration(): array
         'service' => [
             'name' => $_ENV['SERVICE_NAME'] ?? 'Dukcapil Service',
             'version' => $_ENV['SERVICE_VERSION'] ?? '1.0.0',
-            'workerName' => $_ENV['SERVICE_WORKER_NAME'] ?? 'initial-publisher'
+            'workerName' => $_ENV['SERVICE_WORKER_NAME'] ?? 'service-1-publisher'
         ]
     ];
 }
