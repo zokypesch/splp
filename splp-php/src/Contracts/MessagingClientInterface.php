@@ -31,7 +31,7 @@ interface MessagingClientInterface
      * @param array $payload The request payload
      * @return array The response
      */
-    public function request(string $topic, array $payload): array;
+    public function request(string $topic, mixed $payload, int $timeoutMs = 30000): mixed;
 
     /**
      * Start consuming messages from topics

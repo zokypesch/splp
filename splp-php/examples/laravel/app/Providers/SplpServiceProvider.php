@@ -1,11 +1,8 @@
 <?php
 
-declare(strict_types=1);
-
-namespace Splp\Messaging\Laravel;
+namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Facade;
 use Splp\Messaging\Core\MessagingClient;
 use Splp\Messaging\Core\KafkaWrapper;
 use Splp\Messaging\Core\Service1MessageProcessor;
@@ -16,17 +13,14 @@ use Splp\Messaging\Types\CassandraConfig;
 use Splp\Messaging\Types\EncryptionConfig;
 use Splp\Messaging\Utils\SignalHandler;
 
-/**
- * Laravel Service Provider for SPLP Messaging
- */
 class SplpServiceProvider extends ServiceProvider
 {
     /**
-     * Register services
+     * Register services.
      */
     public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__ . '/config/splp.php', 'splp');
+        $this->mergeConfigFrom(__DIR__ . '/../../config/splp.php', 'splp');
 
         // Register legacy MessagingClient for backward compatibility
         $this->app->singleton('splp.messaging', function ($app) {
@@ -100,47 +94,19 @@ class SplpServiceProvider extends ServiceProvider
     }
 
     /**
-     * Bootstrap services
+     * Bootstrap services.
      */
     public function boot(): void
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . '/config/splp.php' => config_path('splp.php'),
+                __DIR__ . '/../../config/splp.php' => config_path('splp.php'),
             ], 'splp-config');
 
-            $this->publishes([
-                __DIR__ . '/migrations' => database_path('migrations'),
-            ], 'splp-migrations');
-
             // Register Artisan commands
-            if ($this->app->runningInConsole()) {
-                $this->commands([
-                    Commands\SplpListenerCommand::class,
-                ]);
-            }
+            $this->commands([
+                \App\Console\Commands\SplpListenerCommand::class,
+            ]);
         }
-    }
-}
-
-/**
- * Laravel Facade for SPLP Messaging
- */
-class SplpMessaging extends Facade
-{
-    protected static function getFacadeAccessor(): string
-    {
-        return 'splp.messaging';
-    }
-}
-
-/**
- * Laravel Facade for SPLP Command Center
- */
-class SplpCommandCenter extends Facade
-{
-    protected static function getFacadeAccessor(): string
-    {
-        return 'splp.command-center';
     }
 }

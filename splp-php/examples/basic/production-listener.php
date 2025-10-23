@@ -57,7 +57,8 @@ try {
         $encryptionService,
         $logger,
         $kafkaConfig,
-        $kafkaWrapper
+        $kafkaWrapper,
+        $config['service']['workerName']
     );
 
     // Set up signal handling for graceful shutdown
@@ -101,10 +102,10 @@ function loadConfiguration(): array
         'kafka' => [
             'brokers' => explode(',', $_ENV['KAFKA_BROKERS'] ?? '10.70.1.23:9092'),
             'clientId' => $_ENV['KAFKA_CLIENT_ID'] ?? 'dukcapil-service',
-            'groupId' => $_ENV['KAFKA_GROUP_ID'] ?? 'service-1-b-group',
+            'groupId' => $_ENV['KAFKA_GROUP_ID'] ?? 'service-1z-group',
             'requestTimeoutMs' => (int)($_ENV['KAFKA_REQUEST_TIMEOUT_MS'] ?? 30000),
             'consumerTopic' => $_ENV['KAFKA_CONSUMER_TOPIC'] ?? 'service-1-topic',
-            'producerTopic' => $_ENV['KAFKA_PRODUCER_TOPIC'] ?? 'command-center-topic'
+            'producerTopic' => $_ENV['KAFKA_PRODUCER_TOPIC'] ?? 'command-center-inbox'
         ],
         'cassandra' => [
             'contactPoints' => explode(',', $_ENV['CASSANDRA_CONTACT_POINTS'] ?? 'localhost'),
@@ -116,7 +117,8 @@ function loadConfiguration(): array
         ],
         'service' => [
             'name' => $_ENV['SERVICE_NAME'] ?? 'Dukcapil Service',
-            'version' => $_ENV['SERVICE_VERSION'] ?? '1.0.0'
+            'version' => $_ENV['SERVICE_VERSION'] ?? '1.0.0',
+            'workerName' => $_ENV['SERVICE_WORKER_NAME'] ?? 'service-1-publisher'
         ]
     ];
 }
@@ -132,4 +134,5 @@ function printConfiguration(array $config): void
     echo "   Cassandra Keyspace: {$config['cassandra']['keyspace']}\n";
     echo "   Service Name: {$config['service']['name']}\n";
     echo "   Service Version: {$config['service']['version']}\n";
+    echo "   Worker Name: {$config['service']['workerName']}\n";
 }

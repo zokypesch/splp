@@ -5,6 +5,9 @@ return [
     |--------------------------------------------------------------------------
     | Kafka Configuration
     |--------------------------------------------------------------------------
+    |
+    | Configuration for Kafka messaging system used by SPLP
+    |
     */
     'kafka' => [
         'brokers' => explode(',', env('SPLP_KAFKA_BROKERS', '10.70.1.23:9092')),
@@ -19,6 +22,9 @@ return [
     |--------------------------------------------------------------------------
     | Cassandra Configuration
     |--------------------------------------------------------------------------
+    |
+    | Configuration for Cassandra database used for logging and tracing
+    |
     */
     'cassandra' => [
         'contactPoints' => explode(',', env('SPLP_CASSANDRA_CONTACT_POINTS', 'localhost')),
@@ -30,6 +36,9 @@ return [
     |--------------------------------------------------------------------------
     | Encryption Configuration
     |--------------------------------------------------------------------------
+    |
+    | Configuration for message encryption using AES-256-GCM
+    |
     */
     'encryption' => [
         'key' => env('SPLP_ENCRYPTION_KEY', 'b9c4d62e772f6e1a4f8e0a139f50d96f7aefb2dc098fe3c53ad22b4b3a9c9e7'),
@@ -39,6 +48,9 @@ return [
     |--------------------------------------------------------------------------
     | Service Configuration
     |--------------------------------------------------------------------------
+    |
+    | Configuration for the SPLP service itself
+    |
     */
     'service' => [
         'name' => env('SPLP_SERVICE_NAME', 'Dukcapil Service'),
@@ -50,6 +62,9 @@ return [
     |--------------------------------------------------------------------------
     | Command Center Configuration
     |--------------------------------------------------------------------------
+    |
+    | Configuration for Command Center integration
+    |
     */
     'commandCenter' => [
         'inboxTopic' => env('SPLP_COMMAND_CENTER_INBOX_TOPIC', 'command-center-inbox'),
@@ -61,6 +76,9 @@ return [
     |--------------------------------------------------------------------------
     | Logging Configuration
     |--------------------------------------------------------------------------
+    |
+    | Configuration for SPLP logging
+    |
     */
     'logging' => [
         'level' => env('SPLP_LOG_LEVEL', 'info'),
@@ -71,6 +89,9 @@ return [
     |--------------------------------------------------------------------------
     | Circuit Breaker Configuration
     |--------------------------------------------------------------------------
+    |
+    | Configuration for circuit breaker pattern
+    |
     */
     'circuitBreaker' => [
         'failureThreshold' => env('SPLP_CIRCUIT_BREAKER_FAILURE_THRESHOLD', 5),
@@ -82,6 +103,9 @@ return [
     |--------------------------------------------------------------------------
     | Retry Configuration
     |--------------------------------------------------------------------------
+    |
+    | Configuration for retry mechanism
+    |
     */
     'retry' => [
         'maxAttempts' => env('SPLP_RETRY_MAX_ATTEMPTS', 3),
@@ -95,6 +119,9 @@ return [
     |--------------------------------------------------------------------------
     | Health Check Configuration
     |--------------------------------------------------------------------------
+    |
+    | Configuration for health check monitoring
+    |
     */
     'healthCheck' => [
         'checkInterval' => env('SPLP_HEALTH_CHECK_INTERVAL', 30000),
