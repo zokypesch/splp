@@ -1,6 +1,7 @@
 package com.perlinsos.splp.types;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.time.Instant;
 import java.util.Objects;
 
 /**
@@ -39,6 +40,10 @@ public class ResponseMessage<T> {
         return new ResponseMessage<>(requestId, payload, true);
     }
 
+    public static <T> ResponseMessage<T> success(String requestId, T payload, Instant timestamp) {
+        return new ResponseMessage<>(requestId, payload, timestamp.toEpochMilli(), true, null);
+    }
+
     public static <T> ResponseMessage<T> error(String requestId, String error) {
         return new ResponseMessage<>(requestId, null, false, error);
     }
@@ -56,6 +61,10 @@ public class ResponseMessage<T> {
     }
 
     public boolean isSuccess() {
+        return success;
+    }
+
+    public boolean getSuccess() {
         return success;
     }
 

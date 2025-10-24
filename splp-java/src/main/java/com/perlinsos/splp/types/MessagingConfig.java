@@ -20,11 +20,23 @@ public class MessagingConfig {
         return kafka;
     }
 
+    public KafkaConfig getKafkaConfig() {
+        return kafka;
+    }
+
     public CassandraConfig getCassandra() {
         return cassandra;
     }
 
+    public CassandraConfig getCassandraConfig() {
+        return cassandra;
+    }
+
     public EncryptionConfig getEncryption() {
+        return encryption;
+    }
+
+    public EncryptionConfig getEncryptionConfig() {
         return encryption;
     }
 

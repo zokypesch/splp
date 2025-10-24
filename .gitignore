@@ -1,5 +1,170 @@
-node_modules
-vendor
+# ============================================
+# Dependencies
+# ============================================
+node_modules/
+vendor/
 composer.lock
-*/bin
-*/obj
+
+# ============================================
+# Build Outputs
+# ============================================
+target/
+*/target/
+build/
+*/build/
+dist/
+*/dist/
+out/
+*/out/
+bin/
+*/bin/
+*/obj/
+nbbuild/
+nbdist/
+
+# ============================================
+# Maven
+# ============================================
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+apache-maven-*/
+
+# ============================================
+# Gradle
+# ============================================
+.gradle/
+gradle-app.setting
+!gradle-wrapper.jar
+
+# ============================================
+# IDE - IntelliJ IDEA
+# ============================================
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# ============================================
+# IDE - Eclipse
+# ============================================
+.classpath
+.project
+.settings/
+*.launch
+.metadata
+
+# ============================================
+# IDE - VS Code
+# ============================================
+.vscode/
+*.code-workspace
+
+# ============================================
+# IDE - NetBeans
+# ============================================
+nbproject/private/
+.nb-gradle/
+
+# ============================================
+# Compiled Files
+# ============================================
+*.class
+*.jar
+*.war
+*.nar
+*.ear
+
+# ============================================
+# Package/Archive Files
+# ============================================
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# ============================================
+# Logs
+# ============================================
+*.log
+*.log.*
+logs/
+
+# ============================================
+# OS Specific
+# ============================================
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+# ============================================
+# Temporary Files
+# ============================================
+*.tmp
+*.temp
+*.swp
+*.swo
+*.bak
+*.cache
+
+# ============================================
+# Test Coverage
+# ============================================
+*.exec
+jacoco.exec
+coverage/
+.nyc_output/
+
+# ============================================
+# JVM Crash Logs
+# ============================================
+hs_err_pid*
+replay_pid*
+
+# ============================================
+# JRebel
+# ============================================
+rebel.xml
+
+# ============================================
+# Sensitive Files
+# ============================================
+*.key
+*.pem
+*.p12
+*.jks
+*.keystore
+.env
+.env.local
+
+# ============================================
+# Application Specific Scripts
+# ============================================
+kill_service.ps1
+run_service_fresh.ps1
+
+# ============================================
+# Documentation (Keep Tracked)
+# ============================================
+!ENCRYPTION_KEY.md
+!README.md
+!*.md

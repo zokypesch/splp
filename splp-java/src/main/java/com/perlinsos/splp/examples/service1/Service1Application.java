@@ -24,13 +24,13 @@ public class Service1Application {
 
     // Kafka configuration
     private static final KafkaConfig KAFKA_CONFIG = new KafkaConfig(
-        Arrays.asList("localhost:9092"),
+        Arrays.asList("10.70.1.23:9092"),
         "dukcapil-service",
-        "dukcapil-group"
+        "service-1f-group"
     );
 
     // Encryption key (in production, load from secure configuration)
-    private static final String ENCRYPTION_KEY = "your-32-character-encryption-key-here-12345";
+    private static final String ENCRYPTION_KEY = "b9c4d62e772f6e1a4f8e0a139f50d96f7aefb2dc098fe3c53ad22b4b3a9c9e7d";
 
     private static KafkaWrapper kafka;
 
@@ -93,8 +93,9 @@ public class Service1Application {
             logger.info("Decrypting message with request ID: {}", requestId);
 
             // Decrypt the payload
-            BansosCitizenRequest citizenRequest = (BansosCitizenRequest) EncryptionService.decryptPayload(
-                encryptedMessage, ENCRYPTION_KEY);
+            var decryptionResult = EncryptionService.decryptPayload(
+                encryptedMessage, ENCRYPTION_KEY, BansosCitizenRequest.class);
+            BansosCitizenRequest citizenRequest = decryptionResult.getPayload();
 
             logger.info("Processing citizen verification for NIK: {}", citizenRequest.getNik());
 
@@ -111,8 +112,17 @@ public class Service1Application {
             logger.info("Encrypting verification result for transmission");
             var encryptedResult = EncryptionService.encryptPayload(result, ENCRYPTION_KEY, requestId);
 
+            // Create outgoing message with routing information (matching Bun version)
+            var outgoingMessage = new com.perlinsos.splp.types.OutgoingMessage(
+                requestId,
+                "service-1-publisher", // This identifies routing: service_1 -> service_2
+                encryptedResult.getData(),
+                encryptedResult.getIv(),
+                encryptedResult.getTag()
+            );
+
             // Send to command-center-inbox for routing to service_2
-            String resultJson = objectMapper.writeValueAsString(encryptedResult);
+            String resultJson = objectMapper.writeValueAsString(outgoingMessage);
             kafka.sendMessage("command-center-inbox", resultJson, requestId).join();
 
             long processingTime = System.currentTimeMillis() - startTime;
@@ -126,31 +136,38 @@ public class Service1Application {
 
     private static DukcapilVerificationResult verifyCitizenData(BansosCitizenRequest request) {
         // Simulate verification process with realistic data
-        logger.info("Verifying citizen data for: {} (NIK: {})", request.getName(), request.getNik());
+        logger.info("Verifying citizen data for: {} (NIK: {})", request.getFullName(), request.getNik());
 
         // Simulate NIK validation
-        String nikStatus = validateNik(request.getNik()) ? "VALID" : "INVALID";
+        String nikStatus = validateNik(request.getNik()) ? "valid" : "invalid";
 
         // Simulate data matching
         boolean dataMatch = simulateDataMatching(request);
 
-        // Simulate family member verification
-        List<FamilyMember> familyMembers = simulateFamilyMemberVerification(request.getNik());
+        // Simulate family member count (instead of list)
+        int familyMembersCount = 2; // Simulate 2 family members
 
         // Simulate address verification
-        AddressVerification addressVerification = simulateAddressVerification(request.getAddress());
+        boolean addressVerified = Math.random() > 0.1; // 90% success rate
 
-        return new DukcapilVerificationResult(
-            request.getNik(),
-            request.getName(),
-            nikStatus,
-            dataMatch,
-            request.getDateOfBirth(),
-            request.getAddress(),
-            familyMembers,
-            addressVerification,
-            Instant.now()
-        );
+        // Create result matching TypeScript interface
+        DukcapilVerificationResult result = new DukcapilVerificationResult();
+        result.setRegistrationId(request.getRegistrationId());
+        result.setNik(request.getNik());
+        result.setFullName(request.getFullName());
+        result.setDateOfBirth(request.getDateOfBirth());
+        result.setAddress(request.getAddress());
+        result.setAssistanceType(request.getAssistanceType());
+        result.setRequestedAmount(request.getRequestedAmount());
+        result.setProcessedBy("Dukcapil Service");
+        result.setNikStatus(nikStatus);
+        result.setDataMatch(dataMatch);
+        result.setFamilyMembers(familyMembersCount);
+        result.setAddressVerified(addressVerified);
+        result.setVerifiedAt(Instant.now().toString());
+        result.setNotes(dataMatch && addressVerified ? "Verification successful" : "Some verification checks failed");
+
+        return result;
     }
 
     private static boolean validateNik(String nik) {
@@ -163,107 +180,108 @@ public class Service1Application {
         return Math.random() > 0.1;
     }
 
-    private static List<FamilyMember> simulateFamilyMemberVerification(String nik) {
-        // Simulate family member data
-        return Arrays.asList(
-            new FamilyMember("1234567890123457", "John Doe Jr", "CHILD", "ACTIVE"),
-            new FamilyMember("1234567890123458", "Jane Doe", "SPOUSE", "ACTIVE")
-        );
-    }
-
-    private static AddressVerification simulateAddressVerification(String address) {
-        // Simulate address verification
-        return new AddressVerification(
-            true,
-            "12345",
-            "Central Jakarta",
-            "DKI Jakarta",
-            "Verified address matches population registry"
-        );
-    }
-
     private static void logProcessingSteps(DukcapilVerificationResult result) {
         logger.info("=== Dukcapil Verification Results ===");
+        logger.info("Registration ID: {}", result.getRegistrationId());
         logger.info("NIK: {} - Status: {}", result.getNik(), result.getNikStatus());
-        logger.info("Name: {}", result.getName());
+        logger.info("Full Name: {}", result.getFullName());
         logger.info("Date of Birth: {}", result.getDateOfBirth());
+        logger.info("Address: {}", result.getAddress());
+        logger.info("Assistance Type: {}", result.getAssistanceType());
+        logger.info("Requested Amount: {}", result.getRequestedAmount());
         logger.info("Data Match: {}", result.isDataMatch() ? "YES" : "NO");
-        logger.info("Address Verified: {}", result.getAddressVerification().isVerified() ? "YES" : "NO");
-        logger.info("Family Members Found: {}", result.getFamilyMembers().size());
-        
-        for (FamilyMember member : result.getFamilyMembers()) {
-            logger.info("  - {} ({}) - {}", member.getName(), member.getRelation(), member.getStatus());
-        }
-        
-        logger.info("Verification completed at: {}", result.getVerificationTimestamp());
+        logger.info("Address Verified: {}", result.isAddressVerified() ? "YES" : "NO");
+        logger.info("Family Members Count: {}", result.getFamilyMembers());
+        logger.info("Processed By: {}", result.getProcessedBy());
+        logger.info("Verified At: {}", result.getVerifiedAt());
+        logger.info("Notes: {}", result.getNotes());
         logger.info("=====================================");
     }
 
     // Data classes for the service
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
     public static class BansosCitizenRequest {
+        private String registrationId;
         private String nik;
-        private String name;
-        private LocalDate dateOfBirth;
+        private String fullName;
+        private String dateOfBirth;
         private String address;
+        private String assistanceType;
+        private Long requestedAmount;
 
         // Constructors
         public BansosCitizenRequest() {}
 
-        public BansosCitizenRequest(String nik, String name, LocalDate dateOfBirth, String address) {
-            this.nik = nik;
-            this.name = name;
-            this.dateOfBirth = dateOfBirth;
-            this.address = address;
-        }
-
         // Getters and setters
+        public String getRegistrationId() { return registrationId; }
+        public void setRegistrationId(String registrationId) { this.registrationId = registrationId; }
+        
         public String getNik() { return nik; }
         public void setNik(String nik) { this.nik = nik; }
 
-        public String getName() { return name; }
-        public void setName(String name) { this.name = name; }
+        public String getFullName() { return fullName; }
+        public void setFullName(String fullName) { this.fullName = fullName; }
 
-        public LocalDate getDateOfBirth() { return dateOfBirth; }
-        public void setDateOfBirth(LocalDate dateOfBirth) { this.dateOfBirth = dateOfBirth; }
+        public String getDateOfBirth() { return dateOfBirth; }
+        public void setDateOfBirth(String dateOfBirth) { this.dateOfBirth = dateOfBirth; }
 
         public String getAddress() { return address; }
         public void setAddress(String address) { this.address = address; }
+        
+        public String getAssistanceType() { return assistanceType; }
+        public void setAssistanceType(String assistanceType) { this.assistanceType = assistanceType; }
+        
+        public Long getRequestedAmount() { return requestedAmount; }
+        public void setRequestedAmount(Long requestedAmount) { this.requestedAmount = requestedAmount; }
     }
 
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
     public static class DukcapilVerificationResult {
+        private String registrationId;
         private String nik;
-        private String name;
+        
+        @com.fasterxml.jackson.annotation.JsonProperty("fullName")
+        private String fullName;
+        
+        private String dateOfBirth;
+        private String address;
+        private String assistanceType;
+        private Long requestedAmount;
+        private String processedBy;
         private String nikStatus;
         private boolean dataMatch;
-        private LocalDate dateOfBirth;
-        private String address;
-        private List<FamilyMember> familyMembers;
-        private AddressVerification addressVerification;
-        private Instant verificationTimestamp;
+        private int familyMembers;
+        private boolean addressVerified;
+        private String verifiedAt;
+        private String notes;
 
         // Constructors
         public DukcapilVerificationResult() {}
 
-        public DukcapilVerificationResult(String nik, String name, String nikStatus, boolean dataMatch,
-                                        LocalDate dateOfBirth, String address, List<FamilyMember> familyMembers,
-                                        AddressVerification addressVerification, Instant verificationTimestamp) {
-            this.nik = nik;
-            this.name = name;
-            this.nikStatus = nikStatus;
-            this.dataMatch = dataMatch;
-            this.dateOfBirth = dateOfBirth;
-            this.address = address;
-            this.familyMembers = familyMembers;
-            this.addressVerification = addressVerification;
-            this.verificationTimestamp = verificationTimestamp;
-        }
-
         // Getters and setters
+        public String getRegistrationId() { return registrationId; }
+        public void setRegistrationId(String registrationId) { this.registrationId = registrationId; }
+
         public String getNik() { return nik; }
         public void setNik(String nik) { this.nik = nik; }
 
-        public String getName() { return name; }
-        public void setName(String name) { this.name = name; }
+        public String getFullName() { return fullName; }
+        public void setFullName(String fullName) { this.fullName = fullName; }
+
+        public String getDateOfBirth() { return dateOfBirth; }
+        public void setDateOfBirth(String dateOfBirth) { this.dateOfBirth = dateOfBirth; }
+
+        public String getAddress() { return address; }
+        public void setAddress(String address) { this.address = address; }
+
+        public String getAssistanceType() { return assistanceType; }
+        public void setAssistanceType(String assistanceType) { this.assistanceType = assistanceType; }
+
+        public Long getRequestedAmount() { return requestedAmount; }
+        public void setRequestedAmount(Long requestedAmount) { this.requestedAmount = requestedAmount; }
+
+        public String getProcessedBy() { return processedBy; }
+        public void setProcessedBy(String processedBy) { this.processedBy = processedBy; }
 
         public String getNikStatus() { return nikStatus; }
         public void setNikStatus(String nikStatus) { this.nikStatus = nikStatus; }
@@ -271,84 +289,17 @@ public class Service1Application {
         public boolean isDataMatch() { return dataMatch; }
         public void setDataMatch(boolean dataMatch) { this.dataMatch = dataMatch; }
 
-        public LocalDate getDateOfBirth() { return dateOfBirth; }
-        public void setDateOfBirth(LocalDate dateOfBirth) { this.dateOfBirth = dateOfBirth; }
+        public int getFamilyMembers() { return familyMembers; }
+        public void setFamilyMembers(int familyMembers) { this.familyMembers = familyMembers; }
 
-        public String getAddress() { return address; }
-        public void setAddress(String address) { this.address = address; }
+        public boolean isAddressVerified() { return addressVerified; }
+        public void setAddressVerified(boolean addressVerified) { this.addressVerified = addressVerified; }
 
-        public List<FamilyMember> getFamilyMembers() { return familyMembers; }
-        public void setFamilyMembers(List<FamilyMember> familyMembers) { this.familyMembers = familyMembers; }
-
-        public AddressVerification getAddressVerification() { return addressVerification; }
-        public void setAddressVerification(AddressVerification addressVerification) { this.addressVerification = addressVerification; }
-
-        public Instant getVerificationTimestamp() { return verificationTimestamp; }
-        public void setVerificationTimestamp(Instant verificationTimestamp) { this.verificationTimestamp = verificationTimestamp; }
-    }
-
-    public static class FamilyMember {
-        private String nik;
-        private String name;
-        private String relation;
-        private String status;
-
-        // Constructors
-        public FamilyMember() {}
-
-        public FamilyMember(String nik, String name, String relation, String status) {
-            this.nik = nik;
-            this.name = name;
-            this.relation = relation;
-            this.status = status;
-        }
-
-        // Getters and setters
-        public String getNik() { return nik; }
-        public void setNik(String nik) { this.nik = nik; }
-
-        public String getName() { return name; }
-        public void setName(String name) { this.name = name; }
-
-        public String getRelation() { return relation; }
-        public void setRelation(String relation) { this.relation = relation; }
-
-        public String getStatus() { return status; }
-        public void setStatus(String status) { this.status = status; }
-    }
-
-    public static class AddressVerification {
-        private boolean verified;
-        private String postalCode;
-        private String district;
-        private String province;
-        private String notes;
-
-        // Constructors
-        public AddressVerification() {}
-
-        public AddressVerification(boolean verified, String postalCode, String district, String province, String notes) {
-            this.verified = verified;
-            this.postalCode = postalCode;
-            this.district = district;
-            this.province = province;
-            this.notes = notes;
-        }
-
-        // Getters and setters
-        public boolean isVerified() { return verified; }
-        public void setVerified(boolean verified) { this.verified = verified; }
-
-        public String getPostalCode() { return postalCode; }
-        public void setPostalCode(String postalCode) { this.postalCode = postalCode; }
-
-        public String getDistrict() { return district; }
-        public void setDistrict(String district) { this.district = district; }
-
-        public String getProvince() { return province; }
-        public void setProvince(String province) { this.province = province; }
+        public String getVerifiedAt() { return verifiedAt; }
+        public void setVerifiedAt(String verifiedAt) { this.verifiedAt = verifiedAt; }
 
         public String getNotes() { return notes; }
         public void setNotes(String notes) { this.notes = notes; }
     }
+
 }

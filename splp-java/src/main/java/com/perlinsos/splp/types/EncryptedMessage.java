@@ -1,20 +1,30 @@
 package com.perlinsos.splp.types;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Objects;
 
 /**
  * Encrypted message structure containing encrypted data with IV and authentication tag
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class EncryptedMessage {
     @JsonProperty("request_id")
-    private final String requestId;
+    private String requestId;
     
-    private final String data;
+    private String data;
     
-    private final String iv;
+    private String iv;
     
-    private final String tag;
+    private String tag;
+
+    // Default constructor for Jackson
+    public EncryptedMessage() {
+        this.requestId = null;
+        this.data = null;
+        this.iv = null;
+        this.tag = null;
+    }
 
     public EncryptedMessage(String requestId, String data, String iv, String tag) {
         this.requestId = Objects.requireNonNull(requestId, "Request ID cannot be null");

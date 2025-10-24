@@ -163,11 +163,13 @@ public class MessagingClient {
                 requestId = encryptedMessage.getRequestId();
 
                 // Decrypt payload
-                Object payload = EncryptionService.decryptPayload(
+                var decryptionResult = EncryptionService.decryptPayload(
                     new EncryptedMessage(encryptedMessage.getRequestId(), encryptedMessage.getData(), 
                                        encryptedMessage.getIv(), encryptedMessage.getTag()),
-                    encryptionKey
+                    encryptionKey,
+                    Object.class
                 );
+                Object payload = decryptionResult.getPayload();
 
                 logger.info("Request received: {} from topic: {}", requestId, topic);
 
@@ -230,7 +232,8 @@ public class MessagingClient {
                 String requestId = encryptedMessage.getRequestId();
 
                 // Decrypt response
-                ResponseMessage<?> response = (ResponseMessage<?>) EncryptionService.decryptPayload(encryptedMessage, encryptionKey);
+                var decryptionResult = EncryptionService.decryptPayload(encryptedMessage, encryptionKey, ResponseMessage.class);
+                ResponseMessage<?> response = decryptionResult.getPayload();
 
                 logger.info("Reply received: {}", requestId);
 

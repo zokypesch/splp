@@ -146,8 +146,7 @@ public class RetryManager {
                 logger.warn("Attempt {} failed, retrying in {}ms...", attempt, delay, error);
 
                 return CompletableFuture
-                    .delayedExecutor(delay, java.util.concurrent.TimeUnit.MILLISECONDS)
-                    .execute(() -> {})
+                    .supplyAsync(() -> null, CompletableFuture.delayedExecutor(delay, java.util.concurrent.TimeUnit.MILLISECONDS))
                     .thenCompose(v -> executeAsyncInternal(supplier, isRetryableError, attempt + 1));
             })
             .thenCompose(future -> future);

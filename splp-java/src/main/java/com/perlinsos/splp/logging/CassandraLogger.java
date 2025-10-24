@@ -229,7 +229,7 @@ public class CassandraLogger {
                 payload,
                 row.getBoolean("success"),
                 row.getString("error"),
-                row.getInt("duration_ms")
+                (long) row.getInt("duration_ms")
             );
         } catch (Exception e) {
             throw new RuntimeException("Failed to map row to LogEntry", e);

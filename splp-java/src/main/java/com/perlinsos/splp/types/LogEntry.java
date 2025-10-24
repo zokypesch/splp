@@ -57,6 +57,18 @@ public class LogEntry {
         return new LogEntry(requestId, Instant.now(), LogType.RESPONSE, topic, null, false, error, durationMs);
     }
 
+    public static LogEntry createRequestLog(String requestId, Instant timestamp, String topic, Object payload) {
+        return new LogEntry(requestId, timestamp, LogType.REQUEST, topic, payload, null, null, null);
+    }
+
+    public static LogEntry createResponseLog(String requestId, Instant timestamp, String topic, Object payload, boolean success, String error, int durationMs) {
+        return new LogEntry(requestId, timestamp, LogType.RESPONSE, topic, payload, success, error, (long) durationMs);
+    }
+
+    public static LogEntry createErrorLog(String requestId, Instant timestamp, String topic, Object payload, String error, int durationMs) {
+        return new LogEntry(requestId, timestamp, LogType.RESPONSE, topic, payload, false, error, (long) durationMs);
+    }
+
     public String getRequestId() {
         return requestId;
     }

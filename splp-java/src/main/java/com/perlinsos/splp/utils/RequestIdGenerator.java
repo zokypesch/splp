@@ -13,6 +13,14 @@ public class RequestIdGenerator {
     private static final Pattern VALID_REQUEST_ID_PATTERN = Pattern.compile("^[A-Za-z0-9]{16}$");
 
     /**
+     * Generate a new random request ID (alias for generateRequestId)
+     * @return A 16-character alphanumeric request ID
+     */
+    public static String generate() {
+        return generateRequestId();
+    }
+
+    /**
      * Generate a new random request ID
      * @return A 16-character alphanumeric request ID
      */

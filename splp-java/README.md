@@ -77,6 +77,10 @@ Start Kafka and Cassandra using Docker Compose:
 docker-compose up -d
 ```
 
+```powershell
+powershell -ExecutionPolicy Bypass -File .\run_service_fresh.ps1
+```
+
 ### 2. Basic Usage
 
 ```java

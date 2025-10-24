@@ -35,10 +35,10 @@ public class EncryptionService {
      * @param encryptionKey 32-byte hex string for AES-256
      * @param requestId The request ID (not encrypted, used for correlation)
      * @param <T> Type of the payload
-     * @return Encrypted message with IV and auth tag
+     * @return Encrypted result with IV and auth tag
      * @throws EncryptionException if encryption fails
      */
-    public static <T> EncryptedMessage encryptPayload(T payload, String encryptionKey, String requestId) 
+    public static <T> EncryptionResult encryptPayload(T payload, String encryptionKey, String requestId) 
             throws EncryptionException {
         try {
             // Validate key
@@ -72,7 +72,7 @@ public class EncryptionService {
             System.arraycopy(encryptedData, 0, encrypted, 0, encryptedLength);
             System.arraycopy(encryptedData, encryptedLength, tag, 0, TAG_LENGTH);
 
-            return new EncryptedMessage(
+            return new EncryptionResult(
                 requestId,
                 HexFormat.of().formatHex(encrypted),
                 HexFormat.of().formatHex(iv),
@@ -98,15 +98,39 @@ public class EncryptionService {
                                                         Class<T> payloadClass) 
             throws EncryptionException {
         try {
+            // Validate input
+            if (encryptedMessage == null) {
+                throw new EncryptionException("Encrypted message is null");
+            }
+            if (encryptedMessage.getIv() == null) {
+                throw new EncryptionException("IV is null");
+            }
+            if (encryptedMessage.getTag() == null) {
+                throw new EncryptionException("Tag is null");
+            }
+            if (encryptedMessage.getData() == null) {
+                throw new EncryptionException("Data is null");
+            }
+
             // Validate key
             byte[] keyBytes = HexFormat.of().parseHex(encryptionKey);
             if (keyBytes.length != KEY_LENGTH) {
                 throw new EncryptionException("Encryption key must be 32 bytes (64 hex characters) for AES-256");
             }
 
-            // Parse hex values
+            // Parse hex values with validation
             byte[] iv = HexFormat.of().parseHex(encryptedMessage.getIv());
+            if (iv.length != IV_LENGTH) {
+                throw new EncryptionException(String.format("IV must be %d bytes, got %d bytes (hex string was %d chars)", 
+                    IV_LENGTH, iv.length, encryptedMessage.getIv().length()));
+            }
+
             byte[] tag = HexFormat.of().parseHex(encryptedMessage.getTag());
+            if (tag.length != TAG_LENGTH) {
+                throw new EncryptionException(String.format("Tag must be %d bytes, got %d bytes (hex string was %d chars)", 
+                    TAG_LENGTH, tag.length, encryptedMessage.getTag().length()));
+            }
+
             byte[] encrypted = HexFormat.of().parseHex(encryptedMessage.getData());
 
             // Combine encrypted data and tag for GCM
@@ -129,8 +153,10 @@ public class EncryptionService {
 
             return new DecryptionResult<>(encryptedMessage.getRequestId(), payload);
 
+        } catch (EncryptionException e) {
+            throw e;
         } catch (Exception e) {
-            throw new EncryptionException("Failed to decrypt payload", e);
+            throw new EncryptionException("Failed to decrypt payload: " + e.getMessage(), e);
         }
     }
 
@@ -148,6 +174,28 @@ public class EncryptionService {
         } catch (NoSuchAlgorithmException e) {
             throw new EncryptionException("Failed to generate encryption key", e);
         }
+    }
+
+    /**
+     * Result of encryption operation
+     */
+    public static class EncryptionResult {
+        private final String requestId;
+        private final String data;
+        private final String iv;
+        private final String tag;
+
+        public EncryptionResult(String requestId, String data, String iv, String tag) {
+            this.requestId = requestId;
+            this.data = data;
+            this.iv = iv;
+            this.tag = tag;
+        }
+
+        public String getRequestId() { return requestId; }
+        public String getData() { return data; }
+        public String getIv() { return iv; }
+        public String getTag() { return tag; }
     }
 
     /**
