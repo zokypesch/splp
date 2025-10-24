@@ -154,9 +154,9 @@ def main():
     if passed == total:
         print("🎉 Package setup completed successfully!")
         print("\nNext steps:")
-        print("1. Edit .env file with your Kafka configuration")
-        print("2. Run 'python examples/basic_example.py' to test")
-        print("3. Run 'python cli_interactive.py' for interactive CLI")
+        print("1. Edit .env file with your Kafka and Cassandra configuration")
+        print("2. Run 'python run_examples.py' to see examples")
+        print("3. Run 'python verify_package.py' to verify everything works")
         print("4. Run 'make help' to see available commands")
         return True
     else:

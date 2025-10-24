@@ -227,7 +227,7 @@ def example_avro_support():
         # Producer with Avro
         with KafkaProducerService(
             config,
-            schema_registry_url="http://localhost:8081",
+            schema_registry_url="http://10.70.1.23:8081",
             avro_schema=avro_schema
         ) as producer:
             user_event = {
@@ -247,7 +247,7 @@ def example_avro_support():
         # Consumer with Avro
         with KafkaConsumerService(
             config,
-            schema_registry_url="http://localhost:8081",
+            schema_registry_url="http://10.70.1.23:8081",
             avro_schema=avro_schema
         ) as consumer:
             message = consumer.poll(timeout=5.0)

@@ -9,7 +9,7 @@ from confluent_kafka.schema_registry import SchemaRegistryClient
 from confluent_kafka.schema_registry.avro import AvroDeserializer
 
 from .config import KafkaConfig
-from .logging_config import get_logger
+import logging
 
 
 class KafkaConsumerService:
@@ -37,7 +37,7 @@ class KafkaConsumerService:
         """
         self.config = config
         self.topics = topics or [config.consumer_topic]
-        self.logger = get_logger(f"{__name__}.consumer")
+        self.logger = logging.getLogger(f"{__name__}.consumer")
         
         # Setup deserializers
         self.key_deserializer = key_deserializer or self._default_key_deserializer
@@ -52,8 +52,13 @@ class KafkaConsumerService:
         consumer_config = config.get_consumer_config()
         self.consumer = Consumer(consumer_config)
         
-        # Subscribe to topics
-        self.consumer.subscribe(self.topics)
+        # Subscribe to topics (similar to example-bun pattern)
+        try:
+            self.consumer.subscribe(self.topics)
+            self.logger.info(f"Subscribed to topics: {self.topics}")
+        except Exception as e:
+            self.logger.error(f"Failed to subscribe to topics {self.topics}: {e}")
+            raise
         
         self.logger.info(
             "Kafka Consumer initialized",

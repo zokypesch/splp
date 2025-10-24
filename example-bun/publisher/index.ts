@@ -16,7 +16,7 @@ const kafkaConfig: KafkaConfig = {
   groupId: 'kemensos-group',
 };
 
-const encryptionKey = process.env.ENCRYPTION_KEY || generateEncryptionKey();
+const encryptionKey = process.env.ENCRYPTION_KEY || 'b9c4d62e772f6e1a4f8e0a139f50d96f7aefb2dc098fe3c53ad22b4b3a9c9e7d';
 console.log("using key: ", encryptionKey);
 
 interface BansosCitizenRequest {
@@ -46,7 +46,7 @@ async function main() {
     const payload: BansosCitizenRequest = {
       registrationId: `BANSOS-${Date.now()}`,
       nik: '3174012501850001',
-      fullName: 'Mismiryandi',
+      fullName: 'Hamba Allah',
       dateOfBirth: '1985-01-25',
       address: 'Jl. Merdeka No. 123, Jakarta Pusat',
       assistanceType: 'XXXX', // Program Keluarga Harapan

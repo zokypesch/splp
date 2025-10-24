@@ -25,7 +25,7 @@ foreach ($topic in $topics) {
     docker exec kafka /opt/kafka/bin/kafka-topics.sh \
         --create \
         --topic "$topic" \
-        --bootstrap-server localhost:9092 \
+        --bootstrap-server 10.70.1.23:9092 \
         --partitions 3 \
         --replication-factor 1 \
         --if-not-exists \
@@ -45,7 +45,7 @@ Write-Host "Current Topics:"
 Write-Host "=========================================="
 docker exec kafka /opt/kafka/bin/kafka-topics.sh \
     --list \
-    --bootstrap-server localhost:9092
+    --bootstrap-server 10.70.1.23:9092
 
 Write-Host ""
 Write-Host "✓ All topics ready!"

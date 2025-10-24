@@ -1,0 +1,8 @@
+#!/Users/yanunasat/workspace/go/den/splp/splp-py/venv311/bin/python3.11
+# -*- coding: utf-8 -*-
+import re
+import sys
+from kafkapy_tools.cli import consumer_cli
+if __name__ == '__main__':
+    sys.argv[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', sys.argv[0])
+    sys.exit(consumer_cli())

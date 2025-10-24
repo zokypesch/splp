@@ -9,7 +9,7 @@ from confluent_kafka.schema_registry import SchemaRegistryClient
 from confluent_kafka.schema_registry.avro import AvroSerializer
 
 from .config import KafkaConfig
-from .logging_config import get_logger
+import logging
 
 
 class KafkaProducerService:
@@ -37,7 +37,7 @@ class KafkaProducerService:
         """
         self.config = config
         self.topic = topic or config.producer_topic
-        self.logger = get_logger(f"{__name__}.producer")
+        self.logger = logging.getLogger(f"{__name__}.producer")
         
         # Setup serializers
         self.key_serializer = key_serializer or self._default_key_serializer

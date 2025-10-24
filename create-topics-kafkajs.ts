@@ -10,10 +10,15 @@ const admin = kafka.admin();
 const topics = [
   'command-center-inbox',
   'service-1-topic',
+  'service-1-topic-reply',
   'service-1a-topic',
+  'service-1a-topic-reply',
   'service-1b-topic',
+  'service-1b-topic-reply',
   'service-1c-topic',
+  'service-1c-topic-reply',
   'service-2-topic',
+  'service-2-topic-reply',
 ];
 
 async function createTopics() {

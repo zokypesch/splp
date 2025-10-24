@@ -1,13 +1,16 @@
 # KafkaPy Tools
 
-Modern Python tools untuk Apache Kafka messaging menggunakan `confluent-kafka` library. Package ini menyediakan interface yang mudah digunakan untuk producer dan consumer Kafka dengan konfigurasi dinamis, logging terstruktur, dan dukungan Avro.
+Modern Python tools untuk Apache Kafka messaging menggunakan `confluent-kafka` library. Package ini menyediakan interface yang mudah digunakan untuk producer dan consumer Kafka dengan request-reply pattern, enkripsi otomatis, logging ke Cassandra, dan fitur-fitur enterprise-grade.
 
 ## 🚀 Fitur Utama
 
+- **MessagingClient**: Request-reply pattern dengan enkripsi otomatis
 - **Producer & Consumer Service**: Interface yang mudah digunakan untuk Kafka messaging
+- **Encryption/Decryption**: Enkripsi otomatis menggunakan AES-GCM
+- **Cassandra Logging**: Logging terstruktur ke Cassandra database
+- **Circuit Breaker**: Pattern untuk resilience dan fault tolerance
+- **Retry Manager**: Exponential backoff dengan jitter
 - **Konfigurasi Dinamis**: Load konfigurasi dari environment variables atau file `.env`
-- **Logging Terstruktur**: JSON logging dengan format yang konsisten
-- **Dukungan Avro**: Integrasi dengan Confluent Schema Registry
 - **CLI Tools**: Command line interface untuk testing dan debugging
 - **Type Safety**: Full type hints dengan Pydantic models
 - **Testing**: Comprehensive test suite dengan pytest
@@ -88,53 +91,114 @@ config = KafkaConfig(
 
 ## 🔧 Penggunaan
 
-### Producer Service
+### MessagingClient (Request-Reply Pattern)
 
 ```python
-from kafkapy_tools import KafkaProducerService, KafkaConfig
+import asyncio
+from kafkapy_tools import (
+    MessagingClient,
+    MessagingConfig,
+    KafkaConfig,
+    CassandraConfig,
+    EncryptionConfig,
+    generate_encryption_key,
+)
 
-# Load konfigurasi
-config = KafkaConfig.from_env()
+# Configuration
+config = MessagingConfig(
+    kafka=KafkaConfig(
+        brokers=["localhost:9092"],
+        client_id="my-client",
+        group_id="my-group",
+    ),
+    cassandra=CassandraConfig(
+        contact_points=["localhost"],
+        local_data_center="datacenter1",
+        keyspace="messaging",
+    ),
+    encryption=EncryptionConfig(
+        encryption_key=generate_encryption_key(),
+    ),
+)
 
-# Buat producer
-with KafkaProducerService(config) as producer:
-    # Kirim single message
-    producer.send_message(
-        message={"id": "123", "data": "Hello Kafka!"},
-        key="message-key",
-        headers={"source": "python-app"}
+async def main():
+    # Initialize client
+    client = MessagingClient(config)
+    await client.initialize()
+    
+    # Send request with automatic encryption
+    response = await client.request(
+        topic="calculate",
+        payload={"operation": "add", "a": 10, "b": 5},
+        timeout_ms=30000
     )
     
-    # Kirim batch messages
-    messages = [
-        ({"id": "1", "data": "Message 1"}, "key1"),
-        ({"id": "2", "data": "Message 2"}, "key2"),
-        ({"id": "3", "data": "Message 3"}, "key3"),
-    ]
-    producer.send_batch(messages)
+    print(f"Result: {response['result']}")
+    
+    await client.close()
+
+# Run
+asyncio.run(main())
 ```
 
-### Consumer Service
+### Worker (Message Handler)
 
 ```python
-from kafkapy_tools import KafkaConsumerService, KafkaConfig
+import asyncio
+from kafkapy_tools import MessagingClient, MessagingConfig
+
+async def main():
+    client = MessagingClient(config)
+    await client.initialize()
+    
+    # Register handler
+    client.register_handler(
+        topic="calculate",
+        handler=async def calculate_handler(request_id: str, payload: dict):
+            operation = payload["operation"]
+            a = payload["a"]
+            b = payload["b"]
+            
+            if operation == "add":
+                result = a + b
+            elif operation == "subtract":
+                result = a - b
+            # ... other operations
+            
+            return {"result": result, "operation": operation}
+    )
+    
+    # Start consuming
+    await client.start_consuming(["calculate"])
+    
+    # Keep running
+    while True:
+        await asyncio.sleep(1)
+
+asyncio.run(main())
+```
+
+### Basic Producer/Consumer
+
+```python
+from kafkapy_tools import KafkaProducerService, KafkaConsumerService, KafkaConfig
 
 # Load konfigurasi
 config = KafkaConfig.from_env()
 
-# Buat consumer
+# Producer
+with KafkaProducerService(config) as producer:
+    producer.send_message(
+        message={"id": "123", "data": "Hello Kafka!"},
+        key="message-key"
+    )
+
+# Consumer
 with KafkaConsumerService(config) as consumer:
     def message_handler(message):
         print(f"Received: {message['value']}")
-        print(f"From topic: {message['topic']}")
-        print(f"Partition: {message['partition']}")
-        print(f"Offset: {message['offset']}")
     
-    # Consume messages continuously
-    consumer.consume_messages(
-        message_handler=message_handler,
-        max_messages=100  # Optional limit
-    )
+    consumer.consume_messages(message_handler=message_handler)
 ```
 
 ### Batch Consumption

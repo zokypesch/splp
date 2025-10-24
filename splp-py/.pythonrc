@@ -1,0 +1,4 @@
+# Menekan warning urllib3/LibreSSL secara global
+import warnings
+warnings.filterwarnings('ignore', message='.*urllib3.*LibreSSL.*')
+warnings.filterwarnings('ignore', message='.*NotOpenSSLWarning.*')

@@ -11,6 +11,19 @@ python = "^3.11"
 confluent-kafka = "^2.3.0"
 python-dotenv = "^1.0.0"
 pydantic = "^2.5.0"
+cassandra-driver = "^3.29.0"
+cryptography = "^41.0.0"
+attrs = "^25.4.0"
+certifi = "^2025.10.5"
+httpx = "^0.28.1"
+cachetools = "^6.2.1"
+authlib = "^1.6.5"
+fastavro = "^1.12.1"
+urllib3 = ">=1.26.0,<2.0.0"
+
+[tool.poetry.scripts]
+kafkapy-producer = "kafkapy_tools.cli:producer_cli"
+kafkapy-consumer = "kafkapy_tools.cli:consumer_cli"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"
@@ -19,10 +32,6 @@ pytest-cov = "^4.1.0"
 ruff = "^0.1.0"
 black = "^23.0.0"
 mypy = "^1.7.0"
-
-[tool.poetry.scripts]
-kafkapy-producer = "kafkapy_tools.cli:producer_cli"
-kafkapy-consumer = "kafkapy_tools.cli:consumer_cli"
 
 [build-system]
 requires = ["poetry-core"]

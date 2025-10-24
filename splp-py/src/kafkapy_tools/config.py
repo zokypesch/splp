@@ -10,7 +10,8 @@ class KafkaConfig(BaseModel):
     """Kafka configuration model."""
     
     # Basic connection settings
-    bootstrap_servers: str = Field(default="localhost:9092", description="Kafka bootstrap servers")
+    bootstrap_servers: str = Field(default="10.70.1.23:9092", description="Kafka bootstrap servers")
+    client_id: str = Field(default="kafkapy-client", description="Kafka client ID")
     security_protocol: str = Field(default="PLAINTEXT", description="Security protocol")
     sasl_mechanism: Optional[str] = Field(default=None, description="SASL mechanism")
     sasl_username: Optional[str] = Field(default=None, description="SASL username")
@@ -26,10 +27,10 @@ class KafkaConfig(BaseModel):
     
     # Consumer settings
     consumer_topic: str = Field(default="test-topic", description="Default consumer topic")
-    consumer_group_id: str = Field(default="test-group", description="Consumer group ID")
-    consumer_auto_offset_reset: str = Field(default="earliest", description="Auto offset reset")
-    consumer_enable_auto_commit: bool = Field(default=True, description="Enable auto commit")
-    consumer_auto_commit_interval_ms: int = Field(default=1000, description="Auto commit interval")
+    consumer_group_id: str = Field(default="service-1-group", description="Consumer group ID")
+    consumer_auto_offset_reset: str = Field(default="latest", description="Auto offset reset")
+    consumer_enable_auto_commit: bool = Field(default=False, description="Enable auto commit")
+    consumer_auto_commit_interval_ms: int = Field(default=5000, description="Auto commit interval")
     consumer_session_timeout_ms: int = Field(default=30000, description="Session timeout")
     consumer_max_poll_records: int = Field(default=500, description="Max poll records")
     
@@ -42,7 +43,7 @@ class KafkaConfig(BaseModel):
             load_dotenv()
         
         return cls(
-            bootstrap_servers=os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092"),
+            bootstrap_servers=os.getenv("KAFKA_BOOTSTRAP_SERVERS", "10.70.1.23:9092"),
             security_protocol=os.getenv("KAFKA_SECURITY_PROTOCOL", "PLAINTEXT"),
             sasl_mechanism=os.getenv("KAFKA_SASL_MECHANISM"),
             sasl_username=os.getenv("KAFKA_SASL_USERNAME"),
@@ -64,43 +65,30 @@ class KafkaConfig(BaseModel):
     
     def get_producer_config(self) -> Dict[str, Any]:
         """Get producer configuration dictionary."""
+        # Konfigurasi berdasarkan splp-php (rdkafka)
         config = {
             "bootstrap.servers": self.bootstrap_servers,
-            "security.protocol": self.security_protocol,
-            "acks": self.producer_acks,
-            "retries": self.producer_retries,
-            "batch.size": self.producer_batch_size,
-            "linger.ms": self.producer_linger_ms,
-            "buffer.memory": self.producer_buffer_memory,
+            "client.id": f"{self.bootstrap_servers.split(':')[0]}-producer",
+            "acks": "all",
+            "retries": 5,
+            "retry.backoff.ms": 100,
+            "message.timeout.ms": self.producer_retries * 1000,  # Use retries as timeout
         }
-        
-        if self.sasl_mechanism:
-            config.update({
-                "sasl.mechanism": self.sasl_mechanism,
-                "sasl.username": self.sasl_username,
-                "sasl.password": self.sasl_password,
-            })
         
         return config
     
     def get_consumer_config(self) -> Dict[str, Any]:
         """Get consumer configuration dictionary."""
+        # Konfigurasi berdasarkan splp-php (rdkafka)
         config = {
             "bootstrap.servers": self.bootstrap_servers,
-            "security.protocol": self.security_protocol,
             "group.id": self.consumer_group_id,
-            "auto.offset.reset": self.consumer_auto_offset_reset,
-            "enable.auto.commit": self.consumer_enable_auto_commit,
-            "auto.commit.interval.ms": self.consumer_auto_commit_interval_ms,
-            "session.timeout.ms": self.consumer_session_timeout_ms,
-            "max.poll.records": self.consumer_max_poll_records,
+            "client.id": f"{self.bootstrap_servers.split(':')[0]}-consumer",
+            "auto.offset.reset": "earliest",
+            "enable.auto.commit": True,
+            "auto.commit.interval.ms": 1000,
+            "session.timeout.ms": 30000,
+            "heartbeat.interval.ms": 3000,
         }
-        
-        if self.sasl_mechanism:
-            config.update({
-                "sasl.mechanism": self.sasl_mechanism,
-                "sasl.username": self.sasl_username,
-                "sasl.password": self.sasl_password,
-            })
         
         return config

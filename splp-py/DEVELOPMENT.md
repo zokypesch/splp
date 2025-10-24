@@ -73,6 +73,13 @@ splp-py/
 │   ├── config.py              # Configuration management
 │   ├── producer.py            # Producer service
 │   ├── consumer.py            # Consumer service
+│   ├── messaging_client.py    # Request-reply messaging client
+│   ├── cassandra_logger.py    # Cassandra logging
+│   ├── crypto.py              # Encryption utilities
+│   ├── circuit_breaker.py     # Circuit breaker pattern
+│   ├── retry_manager.py       # Retry management
+│   ├── utils.py               # Utility functions
+│   ├── types.py               # Type definitions
 │   ├── logging_config.py      # Logging setup
 │   └── cli.py                 # CLI tools
 ├── tests/                     # Test suite
@@ -82,14 +89,21 @@ splp-py/
 │   └── test_consumer.py
 ├── examples/                  # Usage examples
 │   ├── basic_example.py
-│   └── advanced_example.py
+│   ├── advanced_example.py
+│   ├── client_example.py      # Request-reply client
+│   └── worker_example.py      # Request-reply worker
 ├── pyproject.toml            # Poetry configuration
 ├── .pre-commit-config.yaml   # Pre-commit hooks
 ├── .gitignore                # Git ignore rules
 ├── env.example               # Environment template
 ├── README.md                 # Main documentation
 ├── QUICK_START.md            # Quick start guide
-└── LICENSE                   # MIT License
+├── DEVELOPMENT.md            # Development guide
+├── LICENSE                   # MIT License
+├── Makefile                  # Development commands
+├── run_examples.py           # Example runner
+├── verify_package.py         # Package verification
+└── setup_package.py          # Complete setup script
 ```
 
 ## Environment Variables

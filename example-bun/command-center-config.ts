@@ -50,11 +50,11 @@ async function main() {
   console.log('Command Center aktif...');
   console.log('');
   console.log('📋 Configured Routes:');
-  console.log('  1. Kemensos          → service-1-topic   (Routing ke SEMUA layanan verifikasi)');
-  console.log('  2. Dukcapil          → service-2-topic   (Hasil verifikasi ke Kemensos)');
-  console.log('  3. BPJS TK           → service-2-topic   (Hasil verifikasi ke Kemensos)');
-  console.log('  4. BPJS Kesehatan    → service-2-topic   (Hasil verifikasi ke Kemensos)');
-  console.log('  5. Bank Indonesia    → service-2-topic   (Hasil verifikasi ke Kemensos)');
+  console.log('  1. Kemensos (initial-publisher)     → service-1-topic   (Routing ke SEMUA layanan verifikasi)');
+  console.log('  2. Dukcapil (service-1-publisher)   → service-2-topic   (Hasil verifikasi ke Kemensos)');
+  console.log('  3. BPJS TK (service-1a-publisher)   → service-2-topic   (Hasil verifikasi ke Kemensos)');
+  console.log('  4. BPJS Kesehatan (service-1b-publisher) → service-2-topic (Hasil verifikasi ke Kemensos)');
+  console.log('  5. Bank Indonesia (service-1c-publisher) → service-2-topic (Hasil verifikasi ke Kemensos)');
   console.log('');
   console.log('🔄 Message Flow (Parallel Processing):');
   console.log('                      ┌──> Dukcapil (Kependudukan)      ──┐');
@@ -62,6 +62,13 @@ async function main() {
   console.log('  Kemensos → CC ──────┼──> BPJS Kesehatan (Kesehatan)   ──┼──> CC → Kemensos');
   console.log('  (1 pengajuan)       └──> Bank Indonesia (Finansial)   ──┘     (4 hasil)');
   console.log('                        (SEMUA menerima data yang sama)');
+  console.log('');
+  console.log('📊 Publisher Mapping:');
+  console.log('  • initial-publisher     = Kemensos (pengaju bantuan)');
+  console.log('  • service-1-publisher   = Dukcapil (verifikasi kependudukan)');
+  console.log('  • service-1a-publisher  = BPJS TK (verifikasi ketenagakerjaan)');
+  console.log('  • service-1b-publisher  = BPJS Kesehatan (verifikasi kesehatan)');
+  console.log('  • service-1c-publisher  = Bank Indonesia (verifikasi finansial)');
   console.log('');
   console.log('Press Ctrl+C to shutdown');
   console.log('');
@@ -105,7 +112,7 @@ async function registerChainRoutes(commandCenter: CommandCenter) {
   };
 
   await registry.registerRoute(route1);
-  console.log('✓ Route 1: Kemensos → service-1-topic (All verification services)');
+  console.log('✓ Route 1: Kemensos (initial-publisher) → service-1-topic (All verification services)');
 
   // Kemensos Result Aggregation Info
   const kemensosAggregationInfo: ServiceInfo = {
@@ -130,7 +137,7 @@ async function registerChainRoutes(commandCenter: CommandCenter) {
   };
 
   await registry.registerRoute(route2);
-  console.log('✓ Route 2: Dukcapil → service-2-topic (Kemensos)');
+  console.log('✓ Route 2: Dukcapil (service-1-publisher) → service-2-topic (Kemensos)');
 
   // Route 3: BPJS TK → Kemensos
   const route3: RouteConfig = {
@@ -144,7 +151,7 @@ async function registerChainRoutes(commandCenter: CommandCenter) {
   };
 
   await registry.registerRoute(route3);
-  console.log('✓ Route 3: BPJS TK → service-2-topic (Kemensos)');
+  console.log('✓ Route 3: BPJS TK (service-1a-publisher) → service-2-topic (Kemensos)');
 
   // Route 4: BPJS Kesehatan → Kemensos
   const route4: RouteConfig = {
@@ -158,7 +165,7 @@ async function registerChainRoutes(commandCenter: CommandCenter) {
   };
 
   await registry.registerRoute(route4);
-  console.log('✓ Route 4: BPJS Kesehatan → service-2-topic (Kemensos)');
+  console.log('✓ Route 4: BPJS Kesehatan (service-1b-publisher) → service-2-topic (Kemensos)');
 
   // Route 5: Bank Indonesia → Kemensos
   const route5: RouteConfig = {
@@ -172,12 +179,45 @@ async function registerChainRoutes(commandCenter: CommandCenter) {
   };
 
   await registry.registerRoute(route5);
-  console.log('✓ Route 5: Bank Indonesia → service-2-topic (Kemensos)');
+  console.log('✓ Route 5: Bank Indonesia (service-1c-publisher) → service-2-topic (Kemensos)');
+  
+  // Display all registered routes for debugging
+  const allRoutes = registry.getAllRoutes();
+  console.log('');
+  console.log('📋 All Registered Routes:');
+  allRoutes.forEach((route, index) => {
+    console.log(`  ${index + 1}. ${route.sourcePublisher} → ${route.targetTopic} (${route.enabled ? 'enabled' : 'disabled'})`);
+  });
   console.log('');
 }
 
 // Run the command center
 main().catch((error) => {
-  console.error('Command Center error:', error);
+  console.error('❌ Command Center error:', error);
+  
+  // Display detailed error information
+  if (error.message) {
+    console.error('   Error Message:', error.message);
+  }
+  if (error.stack) {
+    console.error('   Stack Trace:', error.stack);
+  }
+  
+  // Display routing information if available
+  if (error.publisher) {
+    console.error('   Publisher:', error.publisher);
+  }
+  if (error.availableRoutes) {
+    console.error('   Available Routes:', error.availableRoutes);
+  }
+  
+  console.error('');
+  console.error('💡 Troubleshooting Tips:');
+  console.error('   1. Check if Kafka broker is running on 10.70.1.23:9092');
+  console.error('   2. Verify that topics exist: command-center-inbox, service-1-topic, service-2-topic');
+  console.error('   3. Ensure encryption key is consistent across all services');
+  console.error('   4. Check publisher names in messages match registered routes');
+  console.error('');
+  
   process.exit(1);
 });
